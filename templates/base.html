@@ -1,1 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TimeTable Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* =========================
+           VIDEO BACKGROUND
+        ========================== */
+        .video-background {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* Dark overlay so content stays readable on all pages */
+        .video-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================== */
+        .navbar {
+            background: rgba(21, 12, 98, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 14px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        /* LOGO */
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .logo-box:hover { opacity: 0.85; }
+
+        .circle {
+            width: 38px; height: 38px;
+            background: white;
+            color: #2d3436;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* NAV LINKS */
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            position: relative;
+        }
+
+        nav a:hover { color: #dfe6e9; }
+
+        /* DROPDOWN */
+        .dropdown { position: relative; }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 35px;
+            background: white;
+            min-width: 180px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            overflow: hidden;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 10px 15px;
+            color: #2d3436;
+            font-weight: 500;
+        }
+
+        .dropdown-content a:hover { background: #f1f2f6; }
+
+        .dropdown:hover .dropdown-content { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =========================
+           PAGE CONTENT WRAPPER
+           Cards / containers on inner pages need white bg
+           so they stay readable against the video
+        ========================== */
+        .page-wrap, .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Make cards slightly more opaque when on video bg */
+        .card, .filter-box, .tt-wrap, .dept-section,
+        .generate-box, .stat-box {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(4px);
+        }
+
+        /* RESPONSIVE */
+        @media(max-width: 768px) {
+            nav { gap: 15px; font-size: 14px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- GLOBAL VIDEO BACKGROUND -->
+<video autoplay muted loop playsinline class="video-background">
+    <source src="{{ url_for('static', filename='videos/bg-video.mp4') }}" type="video/mp4">
+</video>
+<div class="video-overlay"></div>
+
+<header class="navbar">
+
+    <!-- CLICKABLE LOGO -->
+    <a href="{{ url_for('home') }}" class="logo-box">
+        <div class="circle">TT</div>
+        <span>TimeTable Pro</span>
+    </a>
+
+    <nav>
+
+        <a href="{{ url_for('home') }}">Home</a>
+
+        <a href="{{ url_for('about') }}">About</a>
+
+        <!-- DEPARTMENTS DROPDOWN -->
+        <div class="dropdown">
+            <a href="{{ url_for('departments') }}">Departments ▾</a>
+            <div class="dropdown-content">
+                {% for d in nav_departments %}
+                <a href="{{ url_for('faculties', dept_id=d.dept_id) }}">
+                    {{ d.dept_name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- FACULTY -->
+        <a href="{{ url_for('faculty_home') }}">Faculty</a>
+
+        <!-- COURSES DROPDOWN -->
+        <div class="dropdown">
+            <a href="{{ url_for('courses_home') }}">Courses ▾</a>
+            <div class="dropdown-content">
+                {% for d in nav_departments %}
+                <a href="{{ url_for('courses', dept_id=d.dept_id) }}">
+                    {{ d.dept_name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <a href="{{ url_for('details') }}">Details</a>
+
+        <a href="{{ url_for('contact') }}">Contact</a>
+
+    </nav>
+
+</header>
+
+<!-- PAGE CONTENT -->
+{% block content %}{% endblock %}
+
+</body>
+</html>
