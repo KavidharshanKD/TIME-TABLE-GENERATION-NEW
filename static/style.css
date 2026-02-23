@@ -1,1 +1,317 @@
+/* ================= RESET ================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI", Arial, sans-serif;
+}
 
+body{
+    margin:0;
+    padding:0;
+    background:#f4f6f9;
+    color:#1f2937;
+    overflow:hidden;
+}
+
+
+
+/* ================= NAVBAR ================= */
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 60px;
+    background:white;
+    box-shadow:0 3px 12px rgba(0,0,0,0.08);
+    position:fixed;
+    width:100%;
+    top:0;
+    left: 0;
+    right:0;
+    z-index:1000;
+}
+
+/* LOGO */
+.logo-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:20px;
+    font-weight:600;
+}
+
+.circle{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#111827;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+}
+
+/* NAV LINKS */
+nav{
+    display:flex;
+    align-items:center;
+}
+
+nav a{
+    margin-left:32px;
+    text-decoration:none;
+    color:#374151;
+    font-weight:500;
+    position:relative;
+    transition:0.3s;
+}
+
+nav a:hover{
+    color:#111827;
+}
+
+/* underline animation */
+nav a::after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:-6px;
+    width:0%;
+    height:2px;
+    background:#111827;
+    transition:0.3s;
+}
+
+nav a:hover::after{
+    width:100%;
+}
+
+
+/* ================= DROPDOWN ================= */
+.dropdown{
+    position:relative;
+}
+
+.dropdown-content{
+    position:absolute;
+    top:35px;
+    left:0;
+    background:white;
+    min-width:220px;
+    border-radius:8px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.15);
+    padding:10px;
+    display:none;
+}
+
+.dropdown-content a{
+    display:block;
+    padding:8px 12px;
+    text-decoration:none;
+    color:#111827;
+    border-radius:5px;
+}
+
+.dropdown-content a:hover{
+    background:#f3f4f6;
+}
+
+.dropdown:hover .dropdown-content{
+    display:block;
+}
+
+
+/* ================= HERO WITH VIDEO BACKGROUND ================= */
+.hero{
+    height:100vh;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:white;
+    position:relative;
+    overflow:hidden;
+}
+
+/* VIDEO BACKGROUND */
+.video-background{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* DARK OVERLAY ON VIDEO */
+.hero::before{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.55);
+    top:0;
+    left:0;
+    z-index:1;
+}
+
+/* CONTENT ON TOP OF VIDEO */
+.hero-content{
+    position:relative;
+    z-index:2;
+    max-width:700px;
+}
+
+.hero h1{
+    font-size:60px;
+    margin-bottom:10px;
+}
+
+.hero p{
+    font-size:20px;
+    margin-bottom:30px;
+}
+
+
+/* BUTTONS */
+.hero button{
+    padding:14px 32px;
+    border:none;
+    border-radius:6px;
+    background:white;
+    margin:8px;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.hero button:hover{
+    background:#111827;
+    color:white;
+    transform:scale(1.05);
+}
+.page-container{
+    width:85%;
+    margin:auto;
+    margin-top:40px;
+}
+
+.dept-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.dept-card{
+    padding:25px;
+    background:white;
+    border-radius:10px;
+    text-decoration:none;
+    color:#333;
+    font-weight:600;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+    transition:0.3s;
+}
+
+.dept-card:hover{
+    transform:translateY(-5px);
+    background:#f4f6f9;
+}
+
+.form-box{
+    display:flex;
+    gap:15px;
+    margin-bottom:30px;
+    flex-wrap:wrap;
+}
+
+.form-box input,
+.form-box select{
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:6px;
+}
+
+.btn-add{
+    background:#2d3436;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.btn-add:hover{
+    background:#000;
+}
+
+.table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.table th, .table td{
+    padding:12px;
+    border-bottom:1px solid #eee;
+}
+
+.btn-delete{
+    background:#d63031;
+    color:white;
+    padding:6px 12px;
+    border-radius:5px;
+    text-decoration:none;
+}
+
+.btn-delete:hover{
+    background:#b71c1c;
+}
+.page-container{
+    width: 90%;
+    max-width: 1100px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.page-title{
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.page-subtitle{
+    color: gray;
+    margin-bottom: 30px;
+}
+
+.dept-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+    gap: 25px;
+}
+
+.dept-card{
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.dept-card h3{
+    margin-bottom: 15px;
+}
+
+.btn-primary{
+    display: inline-block;
+    padding: 10px 20px;
+    background: #2c3e50;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.btn-primary:hover{
+    background: #1a252f;
+}
