@@ -1759,8 +1759,6 @@ def allocation_resend(round_id, token_id):
         flash(f"No email for {row_data['faculty_name']}. Manual link: {BASE_URL}/allocation/form/{row_data['token']}", "error")
 
     return redirect(url_for("allocation_round_detail", round_id=round_id))
-
-
 # =========================================================
 # TIMETABLE GENERATION
 # =========================================================
@@ -1776,15 +1774,17 @@ def generate_timetable_logic(selected_dept_ids, semester_type="odd"):
       - At most 2 distinct lab courses per day per semester.
 
     THEORY (placed after all labs, Phase 2):
-      - HARD: No two theory periods for the same faculty consecutive on the same
-        day without a break between them. Relaxed only as absolute last resort.
-      - Period preference tiers (fully exhaust before next):
-          Tier 1: periods 1-4, no-continuous enforced
-          Tier 2: periods 5+,  no-continuous enforced
-          Tier 3: periods 1-4, relax no-continuous  (fallback)
-          Tier 4: periods 5+,  relax no-continuous  (absolute last resort)
-      - Last 2 periods (periods N-1 and N) are least preferred — only used
-        when no slot exists in periods 1 through N-2.
+      - STRICT: Free periods at morning (periods 1 & 2) are NEVER allowed for students.
+        Theory placement uses a morning-first waterfall:
+          Tier 1: periods 1-2 (morning), no-continuous enforced  ← always filled first
+          Tier 2: periods 3-4 (mid-early), no-continuous enforced
+          Tier 3: periods 5 to N-2,  no-continuous enforced
+          Tier 4: periods 1-4,       relax no-continuous  (fallback)
+          Tier 5: periods 5..N-2,    relax no-continuous
+          Tier 6: last 2 periods,    relax no-continuous  (absolute last resort)
+      - Candidates sorted by ascending period number so period 1 is ALWAYS
+        chosen before period 2, before period 3, etc. No free morning gaps.
+      - No faculty consecutive theory rule still enforced (relaxed only as last resort).
 
     POST-PLACEMENT OPTIMISATION (Phase 3):
       - Scan every entry placed in the last 2 periods.
@@ -1855,9 +1855,12 @@ def generate_timetable_logic(selected_dept_ids, semester_type="odd"):
         LATE_START  = PREF_END + 1
         # Last 2 periods of the day — least preferred
         LAST2_START = periods_per_day - 1   # e.g. period 5 if 6 periods total
-        early_periods = list(range(1, PREF_END + 1))                        # [1..4]
-        late_periods  = list(range(LATE_START, periods_per_day + 1))        # [5,6]
-        pre_late      = list(range(1, LAST2_START))                         # [1..N-2]
+        # Split early periods: fill morning slots (1-2) strictly before mid (3-4)
+        morning_periods = list(range(1, min(3, PREF_END + 1)))              # [1,2]
+        mid_periods     = list(range(3, PREF_END + 1))                      # [3,4]
+        early_periods   = list(range(1, PREF_END + 1))                      # [1..4]
+        late_periods    = list(range(LATE_START, periods_per_day + 1))      # [5,6]
+        pre_late        = list(range(1, LAST2_START))                       # [1..N-2]
 
         # ── Helpers ────────────────────────────────────────────────────────────
 
@@ -1968,13 +1971,17 @@ def generate_timetable_logic(selected_dept_ids, semester_type="odd"):
 
         def place_theory(course_id, faculty_id, slot_taken, dept_id, semester):
             """
-            4-tier waterfall:
-              Tier 1: periods 1-4,           no-continuous enforced
-              Tier 2: periods 5 to N-2,      no-continuous enforced
-              Tier 3: periods 1-4,           relax no-continuous
-              Tier 4: periods 5+  (all),     relax no-continuous (last resort)
+            6-tier waterfall (morning-first to prevent free periods 1 & 2):
+              Tier 1: periods 1-2 (morning),  no-continuous enforced   ← fill first
+              Tier 2: periods 3-4 (mid-early), no-continuous enforced
+              Tier 3: periods 5 to N-2,       no-continuous enforced
+              Tier 4: periods 1-4,            relax no-continuous (fallback)
+              Tier 5: periods 5..N-2,         relax no-continuous
+              Tier 6: last 2 periods,         relax no-continuous (absolute last resort)
 
-            Last 2 periods are only used in Tier 4 — absolute last resort.
+            Candidates are sorted by ascending period number (primary) so that
+            period 1 is always chosen before period 2, ensuring no free morning gaps.
+            Last 2 periods are only used in Tier 6.
             No-continuous: faculty must not already be teaching at p-1 or p+1
             on the same day (unless a break separates them).
             """
@@ -1984,18 +1991,11 @@ def generate_timetable_logic(selected_dept_ids, semester_type="odd"):
             avail_days = [d for d in days
                           if d in faculty_available_days.get(faculty_id, set(days))]
 
-            def free_early_count(day):
-                return sum(
-                    1 for ep in early_periods
-                    if ep <= periods_per_day and not slot_taken[day].get(ep, True)
-                )
-
             def find_slot(period_list, check_continuous=True):
                 cands = []
                 for day in avail_days:
                     if already_on_day(course_id, dept_id, semester, day):
                         continue
-                    fe = free_early_count(day)
                     for p in period_list:
                         if p < 1 or p > periods_per_day:
                             continue
@@ -2005,33 +2005,36 @@ def generate_timetable_logic(selected_dept_ids, semester_type="odd"):
                             continue
                         if check_continuous and is_continuous(faculty_id, day, p):
                             continue
-                        cands.append((-fe, p, day))
+                        # Sort key: period ascending (primary) so period 1 before 2, etc.
+                        cands.append((p, day))
                 return cands
 
-            # Periods 1..4 — preferred, no-continuous
-            cands = find_slot(early_periods, check_continuous=True)
+            # Tier 1: periods 1-2 (morning) — strictly fill before anything else
+            cands = find_slot(morning_periods, check_continuous=True)
             if not cands:
-                # Periods 5..N-2 — before last-2, no-continuous
+                # Tier 2: periods 3-4 (mid-early), no-continuous
+                cands = find_slot(mid_periods, check_continuous=True)
+            if not cands:
+                # Tier 3: periods 5..N-2, no-continuous
                 cands = find_slot(pre_late, check_continuous=True)
             if not cands:
-                # Periods 1..4 — relax no-continuous (fallback)
+                # Tier 4: periods 1-4, relax no-continuous (fallback)
                 cands = find_slot(early_periods, check_continuous=False)
             if not cands:
-                # Periods 5..N-2 — relax no-continuous
+                # Tier 5: periods 5..N-2, relax no-continuous
                 cands = find_slot(pre_late, check_continuous=False)
             if not cands:
-                # Last 2 periods — no-continuous (only if truly nothing earlier)
+                # Tier 6: last 2 periods — absolute last resort
                 last2 = list(range(LAST2_START, periods_per_day + 1))
                 cands = find_slot(last2, check_continuous=True)
             if not cands:
-                # Last 2 periods — relax (absolute last resort)
                 last2 = list(range(LAST2_START, periods_per_day + 1))
                 cands = find_slot(last2, check_continuous=False)
             if not cands:
                 return False
 
             cands.sort(key=lambda x: (x[0], x[1]))
-            _, p, day = cands[0]
+            p, day = cands[0]
 
             slot_taken[day][p] = True
             mark_busy(faculty_id, day, p)
@@ -2110,18 +2113,11 @@ def generate_timetable_logic(selected_dept_ids, semester_type="odd"):
                                   all_allowed):
             all_fids = [c["faculty_id"] for c in assignable]
 
-            def free_early_count(day):
-                return sum(
-                    1 for ep in early_periods
-                    if ep <= periods_per_day and not slot_taken[day].get(ep, True)
-                )
-
             def find_slot(period_list, check_continuous=True):
                 cands = []
                 for day in [d for d in days if d in all_allowed]:
                     if already_on_day(assignable[0]["course_id"], dept_id, semester, day):
                         continue
-                    fe = free_early_count(day)
                     for p in period_list:
                         if p < 1 or p > periods_per_day:
                             continue
@@ -2133,10 +2129,15 @@ def generate_timetable_logic(selected_dept_ids, semester_type="odd"):
                             is_continuous(f, day, p) for f in all_fids
                         ):
                             continue
-                        cands.append((-fe, p, day))
+                        # Sort key: period ascending so period 1 before 2, etc.
+                        cands.append((p, day))
                 return cands
 
-            cands = find_slot(early_periods, check_continuous=True)
+            # Tier 1: periods 1-2 (morning) — fill before anything else
+            cands = find_slot(morning_periods, check_continuous=True)
+            if not cands:
+                # Tier 2: periods 3-4, no-continuous
+                cands = find_slot(mid_periods, check_continuous=True)
             if not cands:
                 cands = find_slot(pre_late, check_continuous=True)
             if not cands:
@@ -2153,7 +2154,7 @@ def generate_timetable_logic(selected_dept_ids, semester_type="odd"):
                 return False
 
             cands.sort(key=lambda x: (x[0], x[1]))
-            _, p, day = cands[0]
+            p, day = cands[0]
 
             slot_taken[day][p] = True
             for c in assignable:
@@ -2289,37 +2290,34 @@ def generate_timetable_logic(selected_dept_ids, semester_type="odd"):
                     scheduled_eg.add(gid)
 
         # ══════════════════════════════════════════════════════════════════════
-        # PHASE 3: POST-PLACEMENT SWAP — move last-2-period entries earlier
+        # PHASE 3: POST-PLACEMENT SWAP — move any entry in period 3+ earlier
         # ══════════════════════════════════════════════════════════════════════
-        # For every theory entry sitting in the last 2 periods, try to find a
-        # free earlier slot (periods 1 to N-2) on the SAME day where:
+        # For every theory entry NOT in periods 1 or 2, try to pull it into
+        # period 1 or 2 if a free morning slot exists where:
         #   (a) the student slot is free  (slot_taken is False)
         #   (b) the faculty is free at that period
         #   (c) moving there does NOT create a continuous run for the faculty
-        # If found, swap the entry to that earlier slot.
-        # We process entries from earliest late period to latest so earlier
-        # periods get filled first.
+        # This is the safety net ensuring periods 1 & 2 are never left free
+        # when there are courses still to be placed.
+        # We ALSO keep the original last-2-period pull-forward logic.
+        # Process in ascending period order so period 3 is moved before period 4.
 
         if periods_per_day >= 3:
             last2_set = set(range(LAST2_START, periods_per_day + 1))
 
-            # Collect indices of late-period THEORY entries (not labs)
-            late_indices = [
+            # Collect indices of ALL non-lab entries not already in period 1 or 2
+            swap_candidates = [
                 i for i, e in enumerate(entries_to_insert)
-                if e[3] in last2_set   # period in last 2
+                if e[3] > 2   # period > 2
             ]
-            # Sort: process period N-1 before N so we fill earlier slots first
-            late_indices.sort(key=lambda i: entries_to_insert[i][3])
+            # Sort: process lower periods first (3 before 4, 4 before 5, ...)
+            swap_candidates.sort(key=lambda i: entries_to_insert[i][3])
 
-            for idx in late_indices:
+            for idx in swap_candidates:
                 e = entries_to_insert[idx]
                 dept_id_e, sem_e, day_e, p_old, course_id_e, fid_e = e
 
-                # Only try to move theory periods (skip lab periods)
-                # Lab periods come in pairs; if both p and p+1 are in last2 it's
-                # a lab block — don't touch it.
-                # Simple check: if the SAME course+faculty is also at p_old-1 or
-                # p_old+1 in entries_to_insert, it's part of a lab pair — skip.
+                # Skip lab entries (they come in consecutive pairs — don't move them)
                 is_lab_entry = any(
                     (oe[0] == dept_id_e and oe[1] == sem_e and
                      oe[2] == day_e and oe[4] == course_id_e and
@@ -2333,10 +2331,18 @@ def generate_timetable_logic(selected_dept_ids, semester_type="odd"):
                 if slot_taken_s is None:
                     continue
 
-                # Try each period from 1 to LAST2_START-1 (pre-late periods)
-                # in ascending order — fill earliest free slot
+                # Determine target range:
+                # If the entry is in the last-2 zone, try all earlier periods (1..N-2).
+                # Otherwise try only morning periods (1-2) to compact mornings.
+                if p_old in last2_set:
+                    target_range = range(1, LAST2_START)
+                else:
+                    target_range = range(1, 3)  # only try to pull into period 1 or 2
+
                 best_p = None
-                for p_new in range(1, LAST2_START):
+                for p_new in target_range:
+                    if p_new >= p_old:          # only move to earlier period
+                        break
                     if p_new > periods_per_day:
                         break
                     # Student slot must be free
