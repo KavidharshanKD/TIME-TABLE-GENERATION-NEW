@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .alloc-page {
+        width: 92%;
+        max-width: 1100px;
+        margin: 36px auto 60px;
+    }
+
+    .flash-list { list-style: none; margin-bottom: 24px; }
+    .flash-item {
+        padding: 12px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 500;
+        margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;
+        animation: fadeUp 0.4s ease both; line-height: 1.55; word-break: break-word;
+    }
+    .flash-item.success { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.25); color: #bbf7d0; }
+    .flash-item.error   { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.25);  color: #fecaca; }
+    .flash-item.info    { background: rgba(99,179,237,0.12); border: 1px solid rgba(99,179,237,0.25); color: #bfdbfe; }
+
+    .page-head { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+    .page-head-icon {
+        width: 50px; height: 50px; border-radius: 14px;
+        background: rgba(236,179,101,0.12); border: 1px solid rgba(236,179,101,0.22);
+        display: flex; align-items: center; justify-content: center;
+        color: #ecb365; flex-shrink: 0;
+    }
+    .page-head h1 { font-family: 'DM Serif Display', serif; font-size: 28px; color: white; font-weight: 400; margin-bottom: 3px; }
+    .page-head p  { font-size: 13.5px; color: rgba(255,255,255,0.50); margin: 0; }
+
+    .glass-panel {
+        background: rgba(15,18,40,0.52); border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 16px; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+        overflow: hidden; margin-bottom: 28px;
+    }
+    .panel-head {
+        padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.07);
+        display: flex; align-items: center; gap: 10px;
+    }
+    .panel-head-title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.88); }
+    .panel-head-icon  { color: rgba(255,255,255,0.4); flex-shrink: 0; }
+
+    .start-form {
+        padding: 24px;
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 16px;
+        align-items: end;
+    }
+    @media(max-width:720px) {
+        .start-form { grid-template-columns: 1fr 1fr; }
+        .start-form .form-submit { grid-column: span 2; }
+    }
+    @media(max-width:480px) {
+        .start-form { grid-template-columns: 1fr; }
+        .start-form .form-submit { grid-column: auto; }
+    }
+
+    .form-group label {
+        display: block; font-size: 12px; font-weight: 600;
+        color: rgba(255,255,255,0.5); letter-spacing: 0.8px;
+        text-transform: uppercase; margin-bottom: 8px;
+    }
+    .form-select {
+        width: 100%; padding: 10px 14px;
+        background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 8px; color: white; font-size: 14px;
+        font-family: 'DM Sans', sans-serif; outline: none; appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: right 12px center;
+        padding-right: 36px; transition: border-color 0.2s, background 0.2s; cursor: pointer;
+    }
+    .form-select:focus { border-color: rgba(236,179,101,0.5); background-color: rgba(255,255,255,0.09); }
+    .form-select option { background: #1a1a2e; color: white; }
+
+    .btn-start {
+        padding: 10px 22px; border-radius: 8px;
+        background: linear-gradient(135deg, #c84b31, #e06040);
+        color: white; border: none; font-size: 14px; font-weight: 700;
+        font-family: 'DM Sans', sans-serif; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 8px;
+        box-shadow: 0 4px 16px rgba(200,75,49,0.35);
+        transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap;
+    }
+    .btn-start:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(200,75,49,0.5); }
+
+    .info-note {
+        margin: 0 24px 20px; padding: 12px 16px;
+        background: rgba(99,179,237,0.08); border: 1px solid rgba(99,179,237,0.18);
+        border-radius: 8px; font-size: 12.5px; color: rgba(255,255,255,0.55); line-height: 1.65;
+    }
+    .info-note strong { color: rgba(255,255,255,0.80); }
+
+    /* type pills */
+    .type-pills { display: flex; gap: 10px; }
+    .type-pill {
+        flex: 1; padding: 11px 10px; border-radius: 8px; cursor: pointer;
+        border: 1.5px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.04); text-align: center;
+        transition: border-color 0.2s, background 0.2s;
+    }
+    .type-pill input[type=radio] { display: none; }
+    .type-pill .pill-label { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.55); display: block; margin-bottom: 3px; }
+    .type-pill .pill-sub   { font-size: 11.5px; color: rgba(255,255,255,0.30); }
+    .type-pill.selected-odd  { border-color: rgba(99,179,237,0.55);  background: rgba(99,179,237,0.08); }
+    .type-pill.selected-even { border-color: rgba(236,179,101,0.55); background: rgba(236,179,101,0.08); }
+    .type-pill.selected-odd  .pill-label { color: #7dd3fc; }
+    .type-pill.selected-even .pill-label { color: #ecb365; }
+
+    /* Rounds table */
+    .rounds-table { width: 100%; border-collapse: collapse; }
+    .rounds-table th {
+        padding: 10px 20px; text-align: left; font-size: 11px; font-weight: 700;
+        letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.35);
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .rounds-table td {
+        padding: 14px 20px; font-size: 13.5px; color: rgba(255,255,255,0.80);
+        border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle;
+    }
+    .rounds-table tr:last-child td { border-bottom: none; }
+    .rounds-table tr { transition: background 0.15s; }
+    .rounds-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+    .prog-wrap { display: flex; align-items: center; gap: 10px; }
+    .prog-track { flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.08); overflow: hidden; }
+    .prog-fill  { height: 100%; border-radius: 3px; background: linear-gradient(90deg,#22c55e,#4ade80); transition: width 0.4s; }
+    .prog-label { font-size: 11.5px; color: rgba(255,255,255,0.40); white-space: nowrap; }
+
+    .badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 3px 10px; border-radius: 100px;
+        font-size: 11px; font-weight: 700; letter-spacing: 0.4px; white-space: nowrap;
+    }
+    .badge-active    { background: rgba(34,197,94,0.12);   color: #4ade80;  border: 1px solid rgba(34,197,94,0.25); }
+    .badge-review    { background: rgba(251,191,36,0.12);  color: #fbbf24;  border: 1px solid rgba(251,191,36,0.25); }
+    .badge-confirmed { background: rgba(99,179,237,0.12);  color: #7dd3fc;  border: 1px solid rgba(99,179,237,0.25); }
+    .badge-closed    { background: rgba(156,163,175,0.12); color: #9ca3af;  border: 1px solid rgba(156,163,175,0.2); }
+    .badge-odd       { background: rgba(99,179,237,0.10);  color: #7dd3fc;  border: 1px solid rgba(99,179,237,0.22); }
+    .badge-even      { background: rgba(236,179,101,0.10); color: #ecb365;  border: 1px solid rgba(236,179,101,0.22); }
+
+    .td-dept { font-weight: 600; color: white; }
+    .td-date { color: rgba(255,255,255,0.38); font-size: 12.5px; }
+
+    .btn-view {
+        display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px;
+        border-radius: 7px; background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.80);
+        font-size: 12.5px; font-weight: 600; text-decoration: none;
+        transition: background 0.2s, color 0.2s; font-family: 'DM Sans', sans-serif;
+    }
+    .btn-view:hover { background: rgba(255,255,255,0.13); color: white; }
+
+    .btn-del {
+        display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px;
+        border-radius: 7px; background: rgba(239,68,68,0.08);
+        border: 1px solid rgba(239,68,68,0.22); color: #f87171;
+        font-size: 12.5px; font-weight: 600;
+        transition: background 0.2s, border-color 0.2s; font-family: 'DM Sans', sans-serif;
+        cursor: pointer;
+    }
+    .btn-del:hover { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.45); }
+
+    .empty-state { text-align: center; padding: 52px 24px; color: rgba(255,255,255,0.28); }
+    .empty-state svg { opacity: 0.25; margin-bottom: 14px; }
+    .empty-state p { font-size: 14px; }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="alloc-page">
+
+    <div class="page-head">
+        <div class="page-head-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+        </div>
+        <div>
+            <h1>Faculty Allocation</h1>
+            <p>Sequential preference-based course assignment by seniority</p>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flash-list">
+        {% for cat, msg in messages %}
+        <li class="flash-item {{ cat }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px">
+                {% if cat == 'success' %}
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                {% else %}
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                {% endif %}
+            </svg>
+            <span>{{ msg }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Start new round -->
+    <div class="glass-panel">
+        <div class="panel-head">
+            <span class="panel-head-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="16"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+            </span>
+            <span class="panel-head-title">Start New Allocation Round</span>
+        </div>
+
+        <div style="padding:24px;text-align:center">
+            <a href="{{ url_for('allocation_setup') }}" class="btn-start">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                Set Up New Round
+            </a>
+        </div>
+
+        <div class="info-note">
+            Clicking <strong>Set Up New Round</strong> lets you choose the department &amp; semester type, then
+            manually adjust the <strong>Theory + Lab quota</strong> for each faculty before launching.
+            Faculty are sequenced by <strong>seniority rank</strong> and each receives a unique allocation link.
+        </div>
+    </div>
+
+    <!-- Existing rounds -->
+    <div class="glass-panel">
+        <div class="panel-head">
+            <span class="panel-head-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+            </span>
+            <span class="panel-head-title">Allocation Rounds</span>
+        </div>
+
+        {% if rounds %}
+        <div style="overflow-x:auto">
+            <table class="rounds-table">
+                <thead>
+                    <tr>
+                        <th>Department</th>
+                        <th>Type</th>
+                        <th>Progress</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in rounds %}
+                    <tr>
+                        <td class="td-dept">{{ r.dept_name }}</td>
+                        <td>
+                            <span class="badge {{ 'badge-odd' if r.semester_type == 'odd' else 'badge-even' }}">
+                                {{ 'Odd (1,3,5,7)' if r.semester_type == 'odd' else 'Even (2,4,6,8)' }}
+                            </span>
+                        </td>
+                        <td>
+                            {% set pct = ((r.done_count or 0) / (r.total_faculty or 1) * 100)|int %}
+                            <div class="prog-wrap">
+                                <div class="prog-track">
+                                    <div class="prog-fill" style="width:{{ pct }}%"></div>
+                                </div>
+                                <span class="prog-label">{{ r.done_count or 0 }}/{{ r.total_faculty or 0 }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if r.status == 'active' %}
+                            <span class="badge badge-active">
+                                <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block"></span>
+                                Active
+                            </span>
+                            {% elif r.status == 'pending_review' %}
+                            <span class="badge badge-review">Pending Review</span>
+                            {% elif r.status == 'confirmed' %}
+                            <span class="badge badge-confirmed">Confirmed</span>
+                            {% else %}
+                            <span class="badge badge-closed">{{ r.status|capitalize }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="td-date">{{ r.created_at[:10] if r.created_at else '—' }}</td>
+                        <td>
+                            <div style="display:flex;gap:8px;align-items:center">
+                                <a href="{{ url_for('allocation_round_detail', round_id=r.round_id) }}" class="btn-view">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                    View
+                                </a>
+                                <form method="POST"
+                                    action="{{ url_for('allocation_delete', round_id=r.round_id) }}"
+                                    onsubmit="return confirm('Permanently delete Round #{{ r.round_id }} for {{ r.dept_name }}? This cannot be undone.')">
+                                    <button type="submit" class="btn-del" title="Delete round">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"/>
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                            <path d="M10 11v6"/><path d="M14 11v6"/>
+                                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            <p>No allocation rounds yet. Start one above.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+function updatePills() {
+    const oddChecked = document.querySelector('input[value="odd"]').checked;
+    document.getElementById('pill-odd').className  = 'type-pill' + (oddChecked ? ' selected-odd'  : '');
+    document.getElementById('pill-even').className = 'type-pill' + (!oddChecked ? ' selected-even' : '');
+}
+</script>
+
+{% endblock %}

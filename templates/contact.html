@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.contact-wrap {
+    width: 86%; max-width: 860px;
+    margin: 60px auto 80px;
+}
+
+.contact-header {
+    text-align: center;
+    margin-bottom: 50px;
+    animation: fadeUp 0.6s ease both;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.section-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #ecb365;
+    margin-bottom: 16px;
+}
+
+.contact-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 5vw, 50px);
+    color: white;
+    font-weight: 400;
+    letter-spacing: -0.5px;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 640px) { .contact-grid { grid-template-columns: 1fr; } }
+
+.contact-card {
+    background: rgba(255,255,255,0.95);
+    border-radius: 14px;
+    padding: 32px 28px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeUp 0.6s ease both;
+    text-decoration: none;
+    color: inherit;
+}
+
+.contact-card:nth-child(1) { animation-delay: 0.1s; }
+.contact-card:nth-child(2) { animation-delay: 0.2s; }
+.contact-card:nth-child(3) { animation-delay: 0.3s; grid-column: 1 / -1; }
+
+.contact-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.14);
+}
+
+.contact-icon {
+    width: 46px; height: 46px; flex-shrink: 0;
+    background: linear-gradient(135deg, #1a1a2e, #2d3561);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.contact-icon svg { color: #ecb365; }
+
+.contact-info h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    color: #1a1a2e;
+    margin-bottom: 6px;
+    font-weight: 400;
+}
+
+.contact-info p {
+    font-size: 14.5px;
+    color: #5a6474;
+    line-height: 1.6;
+}
+
+.contact-info a {
+    color: #c84b31;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.contact-info a:hover { text-decoration: underline; }
+</style>
+
+<div class="contact-wrap">
+    <div class="contact-header">
+        <div class="section-tag">Get in Touch</div>
+        <h1>Contact Us</h1>
+    </div>
+
+    <div class="contact-grid">
+        <div class="contact-card">
+            <div class="contact-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+            </div>
+            <div class="contact-info">
+                <h3>Email</h3>
+                <p><a href="mailto:info@timetablepro.com">info@timetablepro.com</a></p>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <div class="contact-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.77 10.5 19.79 19.79 0 0 1 1.69 1.9 2 2 0 0 1 3.66 0h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 7.91a16 16 0 0 0 8.18 8.18l1.08-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 24 17.52v-.6z"></path>
+                </svg>
+            </div>
+            <div class="contact-info">
+                <h3>Phone</h3>
+                <p>+91 98765 43210</p>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <div class="contact-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+            </div>
+            <div class="contact-info">
+                <h3>Location</h3>
+                <p>Tamil Nadu, India — For queries regarding timetable management, feel free to reach out at any time.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

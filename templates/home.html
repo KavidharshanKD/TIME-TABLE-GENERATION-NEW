@@ -1,0 +1,667 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .video-overlay {
+        background: linear-gradient(135deg, rgba(10, 12, 28, 0.72) 0%, rgba(26, 32, 72, 0.60) 100%) !important;
+    }
+
+    /* ── Hero wrapper ── */
+    .hero {
+        min-height: calc(100vh - 68px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 32px 24px 48px;
+        position: relative;
+    }
+
+    .hero::before,
+    .hero::after {
+        content: '';
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        border-color: rgba(236, 179, 101, 0.18);
+        border-style: solid;
+        pointer-events: none;
+    }
+
+    .hero::before {
+        top: 32px;
+        left: 40px;
+        border-width: 1px 0 0 1px;
+        border-radius: 4px 0 0 0;
+    }
+
+    .hero::after {
+        bottom: 32px;
+        right: 40px;
+        border-width: 0 1px 1px 0;
+        border-radius: 0 0 4px 0;
+    }
+
+    .hero-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 860px;
+    }
+
+    /* ── Glass card ── */
+    .hero-card {
+        position: relative;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 36px 44px 32px;
+        isolation: isolate;
+        max-width: 600px;
+        width: 100%;
+        margin-bottom: 36px;
+    }
+
+    .hero-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 18, 40, 0.52);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        border-radius: 18px;
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        box-shadow: 0 2px 0 rgba(255, 255, 255, 0.06) inset, 0 24px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(236, 179, 101, 0.08);
+        z-index: -1;
+    }
+
+    .hero-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(236, 179, 101, 0.6), transparent);
+        border-radius: 1px;
+        z-index: 1;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(22px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.35;
+            transform: scale(0.65);
+        }
+    }
+
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(236, 179, 101, 0.10);
+        border: 1px solid rgba(236, 179, 101, 0.32);
+        color: #ecb365;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 2.2px;
+        text-transform: uppercase;
+        padding: 5px 14px;
+        border-radius: 100px;
+        margin-bottom: 22px;
+        animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    .hero-eyebrow .dot {
+        width: 5px;
+        height: 5px;
+        background: #ecb365;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+        flex-shrink: 0;
+    }
+
+    .hero-card h1 {
+        font-family: 'DM Serif Display', serif;
+        font-size: clamp(32px, 5vw, 54px);
+        color: #ffffff;
+        line-height: 1.10;
+        margin-bottom: 14px;
+        letter-spacing: -0.5px;
+        animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    .hero-card h1 em {
+        font-style: italic;
+        background: linear-gradient(90deg, #ecb365, #f5c97a);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-divider {
+        width: 40px;
+        height: 2px;
+        background: linear-gradient(90deg, #c84b31, #ecb365);
+        border-radius: 2px;
+        margin: 0 auto 16px;
+        animation: fadeUp 0.7s 0.25s ease both;
+    }
+
+    .hero-card p {
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 14.5px;
+        line-height: 1.70;
+        margin-bottom: 28px;
+        font-weight: 400;
+        animation: fadeUp 0.7s 0.3s ease both;
+        max-width: 420px;
+    }
+
+    .hero-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        animation: fadeUp 0.7s 0.38s ease both;
+        margin-bottom: 28px;
+    }
+
+    .btn-generate {
+        background: linear-gradient(135deg, #c84b31 0%, #e06040 100%);
+        color: white;
+        border: none;
+        padding: 13px 34px;
+        font-size: 14px;
+        font-weight: 700;
+        border-radius: 9px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.25s;
+        font-family: 'DM Sans', sans-serif;
+        letter-spacing: 0.2px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 20px rgba(200, 75, 49, 0.40);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-generate::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent);
+        pointer-events: none;
+    }
+
+    .btn-generate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 32px rgba(200, 75, 49, 0.52);
+        color: white;
+    }
+
+    .stats-row {
+        display: flex;
+        justify-content: center;
+        animation: fadeUp 0.7s 0.46s ease both;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 10px;
+        padding: 14px 0;
+        width: 100%;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 0 28px;
+        flex: 1;
+    }
+
+    .stat-item:not(:last-child) {
+        border-right: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .stat-item .num {
+        font-family: 'DM Serif Display', serif;
+        font-size: 22px;
+        color: #ecb365;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .stat-item .lbl {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.42);
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    /* ── Feature cards row ── */
+    .features-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        width: 100%;
+        animation: fadeUp 0.7s 0.55s ease both;
+    }
+
+    .feat-card {
+        position: relative;
+        padding: 20px 22px;
+        border-radius: 14px;
+        text-decoration: none;
+        color: white;
+        isolation: isolate;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .feat-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 18, 40, 0.50);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        border-radius: 14px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        z-index: -1;
+        transition: background 0.2s;
+    }
+
+    .feat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+        color: white;
+    }
+
+    .feat-card:hover::before {
+        background: rgba(15, 18, 40, 0.68);
+    }
+
+    /* accent top line per card */
+    .feat-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 16px;
+        right: 16px;
+        height: 1px;
+        border-radius: 1px;
+        opacity: 0.7;
+    }
+
+    .feat-card.orange::after {
+        background: linear-gradient(90deg, transparent, #ecb365, transparent);
+    }
+
+    .feat-card.red::after {
+        background: linear-gradient(90deg, transparent, #c84b31, transparent);
+    }
+
+    .feat-card.blue::after {
+        background: linear-gradient(90deg, transparent, #6ea8fe, transparent);
+    }
+
+    .feat-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .feat-icon.orange {
+        background: rgba(236, 179, 101, 0.15);
+        color: #ecb365;
+    }
+
+    .feat-icon.red {
+        background: rgba(200, 75, 49, 0.15);
+        color: #e07060;
+    }
+
+    .feat-icon.blue {
+        background: rgba(110, 168, 254, 0.15);
+        color: #6ea8fe;
+    }
+
+    .feat-card h4 {
+        font-size: 14px;
+        font-weight: 700;
+        margin: 0;
+        color: white;
+        line-height: 1.2;
+    }
+
+    .feat-card p {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.55);
+        margin: 0;
+        line-height: 1.55;
+        animation: none !important;
+    }
+
+    .feat-arrow {
+        margin-top: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11.5px;
+        font-weight: 600;
+        opacity: 0.6;
+        transition: opacity 0.2s, gap 0.2s;
+        padding-top: 4px;
+    }
+
+    .feat-card:hover .feat-arrow {
+        opacity: 1;
+        gap: 8px;
+    }
+
+    .feat-arrow.orange {
+        color: #ecb365;
+    }
+
+    .feat-arrow.red {
+        color: #e07060;
+    }
+
+    .feat-arrow.blue {
+        color: #6ea8fe;
+    }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.65);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(8px);
+    }
+
+    .modal-box {
+        background: white;
+        border-radius: 16px;
+        padding: 40px 36px;
+        max-width: 420px;
+        width: 92%;
+        text-align: center;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+        animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes modalIn {
+        from {
+            opacity: 0;
+            transform: scale(0.88);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .modal-icon {
+        width: 52px;
+        height: 52px;
+        background: #fff3f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 18px;
+    }
+
+    .modal-box h2 {
+        font-family: 'DM Serif Display', serif;
+        color: #1a1a2e;
+        font-size: 21px;
+        margin-bottom: 9px;
+        font-weight: 400;
+    }
+
+    .modal-box p {
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.65;
+        margin-bottom: 26px;
+        animation: none !important;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .modal-actions a {
+        padding: 9px 18px;
+        border-radius: 7px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .modal-actions a:hover {
+        opacity: 0.88;
+        transform: translateY(-1px);
+    }
+
+    .ma-dark {
+        background: #1a1a2e;
+        color: white;
+    }
+
+    .ma-mid {
+        background: #6b7280;
+        color: white;
+    }
+
+    .modal-cancel {
+        background: #f3f4f6;
+        color: #374151;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 7px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: background 0.2s;
+    }
+
+    .modal-cancel:hover {
+        background: #e5e7eb;
+    }
+
+    @media (max-width: 680px) {
+        .features-row {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-card {
+            padding: 28px 20px 24px;
+        }
+    }
+</style>
+
+<div class="hero">
+    <div class="hero-inner">
+
+        <div class="hero-card">
+            <div class="hero-eyebrow">
+                <span class="dot"></span>
+                Academic Scheduling System
+            </div>
+
+            <h1>Smart Timetables,<br><em>Zero Conflicts</em></h1>
+
+            <div class="hero-divider"></div>
+
+            <p>Automate your institution's schedule with intelligent faculty clash prevention, seniority-based
+                allocation, and flexible period configuration.</p>
+
+            <div class="hero-actions">
+                <a href="{{ url_for('generate_timetable') }}" class="btn-generate">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                    Generate Timetable
+                </a>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="num">100%</div>
+                    <div class="lbl">Conflict Free</div>
+                </div>
+                <div class="stat-item">
+                    <div class="num">Auto</div>
+                    <div class="lbl">Scheduling</div>
+                </div>
+                <div class="stat-item">
+                    <div class="num">Live</div>
+                    <div class="lbl">Preview</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature cards -->
+        <div class="features-row">
+
+            <!-- Elective Groups -->
+            <a href="{{ url_for('elective_groups_home') }}" class="feat-card blue">
+                <div class="feat-icon blue">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="5" r="3" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <circle cx="6" cy="18" r="3" />
+                        <circle cx="18" cy="18" r="3" />
+                        <line x1="9" y1="13" x2="6" y2="15" />
+                        <line x1="15" y1="13" x2="18" y2="15" />
+                    </svg>
+                </div>
+                <h4>Elective Groups</h4>
+                <p>Group Sem 5+ courses to share the same time slot. Students split between elective options.</p>
+                <span class="feat-arrow blue">
+                    Manage Electives
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </span>
+            </a>
+
+
+            <!-- Allocation -->
+            <a href="{{ url_for('allocation_home') }}" class="feat-card orange">
+                <div class="feat-icon orange">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </div>
+                <h4>Faculty Allocation</h4>
+                <p>Sequential seniority-based course preference forms. Each faculty picks their quota in order.</p>
+                <span class="feat-arrow orange">
+                    Manage Rounds
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </span>
+            </a>
+
+            
+            <!-- Exam Timetable -->
+            <a href="{{ url_for('exam_timetable') }}" class="feat-card red">
+                <div class="feat-icon red">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                </div>
+                <h4>Exam Timetable</h4>
+                <p>Generate and export exam schedules with FN/AN sessions. Download as a formatted PDF.</p>
+                <span class="feat-arrow red">
+                    View Exams
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </span>
+            </a>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="modal-backdrop" id="setup-modal">
+    <div class="modal-box">
+        <div class="modal-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c84b31" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+        </div>
+        <h2>Setup Required</h2>
+        <p>Please add departments, faculties, and courses, then generate the timetable before students or faculty can
+            view their schedule.</p>
+        <div class="modal-actions">
+            <a href="{{ url_for('departments') }}" class="ma-dark">Go to Departments</a>
+            <a href="{{ url_for('generate_timetable') }}" class="ma-mid">Generate Timetable</a>
+            <button class="modal-cancel"
+                onclick="document.getElementById('setup-modal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

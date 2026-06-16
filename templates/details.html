@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+html, body { overflow-y: auto !important; }
+
+.wrap { width: 88%; max-width: 940px; margin: 44px auto 80px; }
+
+.page-header { margin-bottom: 32px; animation: fadeUp 0.5s ease both; }
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-header h1 { font-family: 'DM Serif Display', serif; font-size: 34px; color: white; font-weight: 400; letter-spacing: -0.3px; margin-bottom: 4px; }
+.page-header p  { color: rgba(255,255,255,0.55); font-size: 14.5px; }
+
+.flash { border-radius: 8px; padding: 12px 18px; margin-bottom: 20px; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+.flash-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+.flash-error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+/* STATS */
+.stat-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 14px; margin-bottom: 24px;
+    animation: fadeUp 0.5s 0.05s ease both;
+}
+@media(max-width: 640px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.stat-box {
+    background: rgba(255,255,255,0.96) !important;
+    border-radius: 12px; padding: 22px 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center; transition: transform 0.3s ease;
+}
+.stat-box:hover { transform: translateY(-3px); }
+.stat-num { font-family: 'DM Serif Display', serif; font-size: 36px; color: #1a1a2e; line-height: 1; margin-bottom: 6px; }
+.stat-lbl { font-size: 12px; color: #9ca3af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
+
+/* CARDS */
+.card {
+    background: rgba(255,255,255,0.96) !important;
+    border-radius: 14px; padding: 32px 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    margin-bottom: 22px; animation: fadeUp 0.5s ease both;
+}
+
+.card h3 { font-family: 'DM Serif Display', serif; font-size: 19px; color: #1a1a2e; font-weight: 400; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid #f0f1f5; }
+
+.card h3 .section-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 8px;
+    margin-right: 10px; vertical-align: middle;
+}
+
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+@media(max-width: 640px) { .form-row-2 { grid-template-columns: 1fr; } }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 12px; font-weight: 600; color: #6b7280; letter-spacing: 0.5px; text-transform: uppercase; }
+
+.form-group input,
+.form-group select {
+    padding: 10px 14px; border: 1.5px solid #e5e7eb;
+    border-radius: 8px; font-size: 14px;
+    font-family: 'DM Sans', sans-serif; color: #1a1a2e;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: white;
+}
+.form-group input:focus,
+.form-group select:focus {
+    outline: none; border-color: #2d3561;
+    box-shadow: 0 0 0 3px rgba(45,53,97,0.1);
+}
+
+/* password toggle */
+.input-with-toggle { position: relative; }
+.input-with-toggle input { width: 100%; padding-right: 42px; }
+.toggle-pw {
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: #9ca3af; padding: 0; display: flex; align-items: center;
+    transition: color 0.2s;
+}
+.toggle-pw:hover { color: #1a1a2e; }
+
+/* SMTP status badge */
+.smtp-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 100px;
+    font-size: 12.5px; font-weight: 600; margin-left: 12px;
+    vertical-align: middle;
+}
+.smtp-ok  { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+.smtp-no  { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.smtp-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* info note */
+.info-note {
+    background: #eff6ff; border: 1px solid #bfdbfe;
+    border-radius: 9px; padding: 12px 16px;
+    font-size: 13px; color: #1e40af; line-height: 1.6;
+    margin-bottom: 20px; display: flex; align-items: flex-start; gap: 9px;
+}
+.info-note svg { flex-shrink: 0; margin-top: 1px; }
+.info-note a { color: #1d4ed8; font-weight: 600; }
+
+/* test email btn */
+.btn-test {
+    background: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe;
+    padding: 9px 20px; border-radius: 8px;
+    font-size: 13.5px; font-weight: 600; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-flex; align-items: center; gap: 7px;
+}
+.btn-test:hover { background: #dbeafe; transform: translateY(-1px); }
+
+/* DAYS */
+.days-wrap { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+
+.day-pill {
+    display: flex; align-items: center; gap: 7px;
+    background: #f3f4f8; padding: 8px 16px; border-radius: 8px;
+    cursor: pointer; font-size: 13.5px; font-weight: 600; color: #4b5563;
+    border: 2px solid transparent; transition: all 0.2s; user-select: none;
+}
+.day-pill input[type=checkbox] { width: 14px; height: 14px; cursor: pointer; }
+.day-pill:has(input:checked) { background: #1a1a2e; color: white; border-color: #1a1a2e; }
+
+/* BREAKS */
+.break-box {
+    background: #f9faff; border-radius: 10px; padding: 18px 20px;
+    margin-bottom: 12px; border: 1px solid #e8eaf6;
+}
+.break-box strong { font-size: 13.5px; color: #1a1a2e; font-weight: 600; display: block; margin-bottom: 12px; }
+.break-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.break-field label { font-size: 12px; font-weight: 600; color: #6b7280; letter-spacing: 0.4px; text-transform: uppercase; display: block; margin-bottom: 5px; }
+.break-field input {
+    width: 100%; padding: 9px 12px; border: 1.5px solid #e5e7eb; border-radius: 7px;
+    font-size: 14px; font-family: 'DM Sans', sans-serif; color: #1a1a2e;
+    box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.break-field input:focus { outline: none; border-color: #2d3561; box-shadow: 0 0 0 3px rgba(45,53,97,0.1); }
+
+.save-btn {
+    background: #1a1a2e; color: white; border: none;
+    padding: 12px 28px; border-radius: 8px;
+    font-size: 14.5px; font-weight: 600; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-flex; align-items: center; gap: 8px;
+}
+.save-btn:hover { background: #c84b31; transform: translateY(-1px); }
+
+.save-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+
+/* CURRENT SETTINGS */
+.info-row { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
+.info-row:last-child { border-bottom: none; }
+.info-label { font-weight: 600; color: #6b7280; min-width: 180px; font-size: 13px; }
+.info-value { color: #1a1a2e; }
+
+.gen-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #1a1a2e; color: white;
+    padding: 11px 24px; border-radius: 8px;
+    text-decoration: none; font-weight: 600;
+    font-size: 14px; transition: background 0.2s, transform 0.15s;
+    margin-top: 16px;
+}
+.gen-link:hover { background: #c84b31; transform: translateY(-1px); }
+
+/* spinner for test */
+.spinner {
+    width: 14px; height: 14px; border: 2px solid #bfdbfe;
+    border-top-color: #1d4ed8; border-radius: 50%;
+    animation: spin 0.7s linear infinite; display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<div class="wrap">
+    <div class="page-header">
+        <h1>Timetable Details</h1>
+        <p>Configure periods, breaks, working days and email settings</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+            {% if category == 'success' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            {% endif %}
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endwith %}
+
+    <!-- STATS -->
+    <div class="stat-grid">
+        <div class="stat-box"><div class="stat-num">{{ total_departments }}</div><div class="stat-lbl">Departments</div></div>
+        <div class="stat-box"><div class="stat-num">{{ total_faculties }}</div><div class="stat-lbl">Faculties</div></div>
+        <div class="stat-box"><div class="stat-num">{{ total_courses }}</div><div class="stat-lbl">Courses</div></div>
+        <div class="stat-box"><div class="stat-num">{{ total_timetable_entries }}</div><div class="stat-lbl">Slots</div></div>
+    </div>
+
+    <!-- PERIOD SETTINGS -->
+    <div class="card" style="animation-delay: 0.1s">
+        <h3>Period Configuration</h3>
+        <form method="POST">
+            <div class="form-row-2">
+                <div class="form-group">
+                    <label>Periods per Day</label>
+                    <input type="number" name="periods_per_day" min="1" max="12" value="{{ settings.periods_per_day if settings else '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Period Duration (minutes)</label>
+                    <input type="number" name="period_duration" min="15" value="{{ settings.period_duration if settings else '' }}" required>
+                </div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group">
+                    <label>Start Time</label>
+                    <input type="time" name="start_time" value="{{ settings.start_time if settings and settings.start_time else '09:00' }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Number of Breaks</label>
+                    <input type="number" name="number_of_breaks" id="num_breaks" min="0" value="{{ settings.number_of_breaks if settings else '0' }}" oninput="renderBreakInputs()" required>
+                </div>
+            </div>
+
+            <div id="break-inputs-wrap"></div>
+
+            <div class="form-group" style="margin-bottom: 24px;">
+                <label>Working Days</label>
+                <div class="days-wrap" style="margin-top:10px;">
+                    {% for day in all_days %}
+                    <label class="day-pill">
+                        <input type="checkbox" name="working_days" value="{{ day }}" {% if day in saved_days %}checked{% endif %}>
+                        {{ day }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button type="submit" class="save-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                Save Settings
+            </button>
+        </form>
+    </div>
+
+    <!-- EMAIL / SMTP SETTINGS -->
+    <div class="card" style="animation-delay: 0.15s">
+        <h3>
+            <span class="section-icon" style="background:#eff6ff">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            Email / SMTP Settings
+            {% if smtp_config and smtp_config.smtp_configured %}
+                <span class="smtp-status smtp-ok"><span class="smtp-dot"></span> Configured</span>
+            {% else %}
+                <span class="smtp-status smtp-no"><span class="smtp-dot"></span> Not configured</span>
+            {% endif %}
+        </h3>
+
+        <div class="info-note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>
+                Use a <strong>Gmail App Password</strong>, not your regular Gmail password.
+                Go to <a href="https://myaccount.google.com/apppasswords" target="_blank">myaccount.google.com/apppasswords</a>
+                → Create an app password → paste it below. 2-Step Verification must be enabled on your Google account.
+            </span>
+        </div>
+
+        <form method="POST" action="{{ url_for('save_smtp') }}">
+            <div class="form-row-2">
+                <div class="form-group">
+                    <label>Sender Gmail Address</label>
+                    <input type="email" name="smtp_email"
+                           placeholder="yourname@gmail.com"
+                           value="{{ smtp_config.smtp_email if smtp_config else '' }}"
+                           required>
+                </div>
+                <div class="form-group">
+                    <label>Gmail App Password</label>
+                    <div class="input-with-toggle">
+                        <input type="password" name="smtp_password" id="smtp_password"
+                               placeholder="xxxx xxxx xxxx xxxx"
+                               value="{{ smtp_config.smtp_password if smtp_config else '' }}"
+                               autocomplete="new-password">
+                        <button type="button" class="toggle-pw" onclick="togglePw()">
+                            <svg id="pw-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row-2">
+                <div class="form-group">
+                    <label>Sender Display Name</label>
+                    <input type="text" name="smtp_sender_name"
+                           placeholder="TimeTable Pro"
+                           value="{{ smtp_config.smtp_sender_name if smtp_config else 'TimeTable Pro' }}">
+                </div>
+                <div class="form-group">
+                    <label>Reply-To Email (optional)</label>
+                    <input type="email" name="smtp_reply_to"
+                           placeholder="admin@yourinstitution.edu"
+                           value="{{ smtp_config.smtp_reply_to if smtp_config else '' }}">
+                </div>
+            </div>
+
+            <div class="save-row">
+                <button type="submit" class="save-btn">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Save Email Settings
+                </button>
+
+                {% if smtp_config and smtp_config.smtp_configured %}
+                <button type="button" class="btn-test" onclick="sendTestEmail()" id="testBtn">
+                    <svg id="test-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    <div class="spinner" id="test-spinner"></div>
+                    Send Test Email
+                </button>
+                <span id="test-result" style="font-size:13px;font-weight:600"></span>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    {% if settings %}
+    <div class="card" style="animation-delay: 0.2s">
+        <h3>Current Configuration</h3>
+        <div class="info-row"><span class="info-label">Periods Per Day</span><span class="info-value">{{ settings.periods_per_day }}</span></div>
+        <div class="info-row"><span class="info-label">Period Duration</span><span class="info-value">{{ settings.period_duration }} minutes</span></div>
+        <div class="info-row"><span class="info-label">Start Time</span><span class="info-value">{{ settings.start_time if settings.start_time else '09:00' }}</span></div>
+        <div class="info-row"><span class="info-label">Number of Breaks</span><span class="info-value">{{ settings.number_of_breaks }}</span></div>
+        <div class="info-row"><span class="info-label">Working Days</span><span class="info-value">{{ settings.working_days }}</span></div>
+        <div style="text-align:center; margin-top:20px;">
+            <a href="{{ url_for('generate_timetable') }}" class="gen-link">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                Go to Timetable Generator
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+var savedBreaks = {{ saved_breaks | tojson }};
+
+function renderBreakInputs() {
+    var n = parseInt(document.getElementById("num_breaks").value) || 0;
+    var wrap = document.getElementById("break-inputs-wrap");
+    wrap.innerHTML = "";
+    for (var i = 0; i < n; i++) {
+        var after = savedBreaks[i] ? savedBreaks[i].after_period : "";
+        var dur   = savedBreaks[i] ? savedBreaks[i].duration : "";
+        wrap.innerHTML += `
+        <div class="break-box">
+            <strong>Break ${i+1}</strong>
+            <div class="break-fields">
+                <div class="break-field">
+                    <label>After Period Number</label>
+                    <input type="number" name="break_after_period" min="1" value="${after}" required>
+                </div>
+                <div class="break-field">
+                    <label>Duration (minutes)</label>
+                    <input type="number" name="break_duration" min="1" value="${dur}" required>
+                </div>
+            </div>
+        </div>`;
+    }
+}
+
+window.addEventListener("DOMContentLoaded", renderBreakInputs);
+
+function togglePw() {
+    const inp = document.getElementById('smtp_password');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function sendTestEmail() {
+    const btn = document.getElementById('testBtn');
+    const icon = document.getElementById('test-icon');
+    const spinner = document.getElementById('test-spinner');
+    const result = document.getElementById('test-result');
+
+    btn.disabled = true;
+    icon.style.display = 'none';
+    spinner.style.display = 'block';
+    result.textContent = '';
+
+    fetch('/smtp/test', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            spinner.style.display = 'none';
+            icon.style.display = 'block';
+            btn.disabled = false;
+            if (data.success) {
+                result.style.color = '#065f46';
+                result.textContent = '✓ Test email sent to ' + data.sent_to;
+            } else {
+                result.style.color = '#991b1b';
+                result.textContent = '✗ ' + data.error;
+            }
+        })
+        .catch(() => {
+            spinner.style.display = 'none';
+            icon.style.display = 'block';
+            btn.disabled = false;
+            result.style.color = '#991b1b';
+            result.textContent = '✗ Network error';
+        });
+}
+</script>
+
+{% endblock %}

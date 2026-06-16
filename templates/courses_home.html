@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+html, body { overflow-y: auto !important; }
+
+.wrap { width: 88%; max-width: 960px; margin: 60px auto 80px; }
+
+.page-header { margin-bottom: 40px; animation: fadeUp 0.5s ease both; }
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.section-tag { font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #ecb365; margin-bottom: 12px; display: block; }
+
+.page-header h1 { font-family: 'DM Serif Display', serif; font-size: 38px; color: white; font-weight: 400; letter-spacing: -0.3px; }
+
+.dept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
+}
+
+.dept-card {
+    background: rgba(255,255,255,0.96);
+    border-radius: 14px; padding: 28px 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 2px solid transparent;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.2s;
+    animation: fadeUp 0.5s ease both;
+}
+
+.dept-card:nth-child(1) { animation-delay: 0.05s; }
+.dept-card:nth-child(2) { animation-delay: 0.10s; }
+.dept-card:nth-child(3) { animation-delay: 0.15s; }
+.dept-card:nth-child(4) { animation-delay: 0.20s; }
+.dept-card:nth-child(5) { animation-delay: 0.25s; }
+.dept-card:nth-child(6) { animation-delay: 0.30s; }
+
+.dept-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.16); border-color: #c84b31; }
+
+.dept-icon {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #1a1a2e, #2d3561);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 18px; color: #ecb365;
+    margin-bottom: 16px;
+}
+
+.dept-card h3 { font-size: 15px; font-weight: 600; color: #1a1a2e; margin-bottom: 14px; }
+
+.manage-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #1a1a2e; color: white;
+    text-decoration: none; padding: 8px 16px;
+    border-radius: 6px; font-size: 13px; font-weight: 600;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.manage-btn:hover { background: #c84b31; transform: translateY(-1px); }
+</style>
+
+<div class="wrap">
+    <div class="page-header">
+        <span class="section-tag">Course Management</span>
+        <h1>Select Department</h1>
+    </div>
+
+    <div class="dept-grid">
+        {% for dept in departments %}
+        <div class="dept-card">
+            <div class="dept-icon">{{ dept.dept_name[0] | upper }}</div>
+            <h3>{{ dept.dept_name }}</h3>
+            <a href="/courses/{{ dept.dept_id }}" class="manage-btn">
+                Manage Courses
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

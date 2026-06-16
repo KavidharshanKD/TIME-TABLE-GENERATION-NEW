@@ -1,0 +1,455 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+html, body { overflow-y: auto !important; }
+
+.wrap { width: 90%; max-width: 1060px; margin: 44px auto 80px; }
+
+.page-header { margin-bottom: 28px; animation: fadeUp 0.5s ease both; }
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 34px; color: white; font-weight: 400;
+    letter-spacing: -0.3px; margin-bottom: 4px;
+}
+.page-header p { color: rgba(255,255,255,0.55); font-size: 14.5px; }
+
+.flash {
+    border-radius: 8px; padding: 12px 18px;
+    margin-bottom: 20px; font-weight: 500; font-size: 14px;
+    display: flex; align-items: center; gap: 10px;
+}
+.flash-error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.flash-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+
+.card {
+    background: rgba(255,255,255,0.96);
+    border-radius: 14px; padding: 30px 32px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+    animation: fadeUp 0.5s ease both;
+}
+
+.card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 19px; color: #1a1a2e; font-weight: 400;
+    margin-bottom: 22px; padding-bottom: 14px;
+    border-bottom: 1px solid #f0f1f5;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.fg { display: flex; flex-direction: column; gap: 6px; }
+
+.fg label {
+    font-size: 11.5px; font-weight: 600; color: #6b7280;
+    letter-spacing: 0.6px; text-transform: uppercase;
+}
+
+.fg select,
+.fg input[type=date],
+.fg input[type=number] {
+    padding: 10px 14px;
+    border: 1.5px solid #e5e7eb; border-radius: 8px;
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    color: #1a1a2e; background: white;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.fg select:focus,
+.fg input:focus {
+    outline: none; border-color: #2d3561;
+    box-shadow: 0 0 0 3px rgba(45,53,97,0.1);
+}
+
+.pill-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+
+.pill {
+    display: flex; align-items: center; gap: 7px;
+    background: #f3f4f8; padding: 9px 16px; border-radius: 8px;
+    cursor: pointer; font-size: 13.5px; font-weight: 600; color: #4b5563;
+    border: 2px solid transparent; transition: all 0.2s; user-select: none;
+}
+.pill input { width: 14px; height: 14px; cursor: pointer; }
+.pill:has(input:checked) { background: #1a1a2e; color: white; border-color: #1a1a2e; }
+
+.section-label {
+    font-size: 11.5px; font-weight: 600; color: #6b7280;
+    letter-spacing: 0.6px; text-transform: uppercase;
+    margin-bottom: 8px; display: block;
+}
+
+.gen-btn {
+    background: linear-gradient(135deg, #c84b31, #e05a38);
+    color: white; border: none;
+    padding: 12px 28px; font-size: 14.5px; font-weight: 600;
+    border-radius: 8px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: transform 0.2s, box-shadow 0.3s;
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 10px;
+}
+.gen-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(200,75,49,0.4); }
+
+/* RESULT */
+.tt-card {
+    background: rgba(255,255,255,0.96);
+    border-radius: 14px; overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    animation: fadeUp 0.5s 0.1s ease both;
+}
+
+.tt-card-header {
+    padding: 18px 24px; border-bottom: 1px solid #f0f1f5;
+    display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+
+.tt-card-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px; color: #1a1a2e; font-weight: 400;
+}
+
+/* ── Action Buttons ── */
+.btn-group { display: flex; gap: 10px; align-items: center; }
+
+.pdf-btn, .copy-link-btn {
+    border: none; padding: 9px 18px; font-size: 13.5px; font-weight: 600;
+    border-radius: 8px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-flex; align-items: center; gap: 7px;
+    text-decoration: none;
+}
+.pdf-btn { background: #1a1a2e; color: white; }
+.pdf-btn:hover { background: #c84b31; transform: translateY(-1px); }
+
+.copy-link-btn { background: #f3f4f8; color: #1a1a2e; }
+.copy-link-btn:hover { background: #e5e7eb; transform: translateY(-1px); }
+
+/* Toast */
+.copy-toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #1a1a2e; color: white;
+    padding: 10px 22px; border-radius: 100px;
+    font-size: 13.5px; font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 9999; display: flex; align-items: center; gap: 8px;
+}
+.copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.tt-scroll { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; min-width: 660px; }
+
+thead th {
+    background: #1a1a2e; color: rgba(255,255,255,0.8);
+    padding: 11px 14px; text-align: left;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.8px; text-transform: uppercase;
+}
+
+tbody tr { border-bottom: 1px solid #f0f1f5; transition: background 0.15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f9faff; }
+tbody td { padding: 12px 14px; font-size: 13.5px; color: #374151; vertical-align: middle; }
+
+.date-td { font-weight: 700; color: #1a1a2e; white-space: nowrap; }
+.day-td  { color: #9ca3af; font-size: 12px; font-weight: 600; }
+
+.sess-badge {
+    display: inline-block; padding: 3px 11px; border-radius: 100px;
+    font-size: 11.5px; font-weight: 700;
+}
+.sess-FN { background: #fef9c3; color: #854d0e; }
+.sess-AN { background: #dbeafe; color: #1e40af; }
+
+.type-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 100px;
+    font-size: 11px; font-weight: 600;
+}
+.type-theory { background: #eff6ff; color: #1d4ed8; }
+.type-lab    { background: #f0fdf4; color: #166534; }
+
+.no-data { text-align: center; color: #9ca3af; font-size: 15px; padding: 50px 24px; }
+
+/* View-mode banner */
+.view-banner {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 10px; padding: 12px 20px; margin-bottom: 22px;
+    display: flex; align-items: center; gap: 10px;
+    color: rgba(255,255,255,0.85); font-size: 13.5px;
+    animation: fadeUp 0.5s 0.05s ease both;
+}
+.view-banner svg { flex-shrink: 0; opacity: 0.7; }
+.view-banner a { color: white; font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.4); margin-left: 4px; }
+.view-banner a:hover { border-bottom-color: white; }
+
+.row-num { color: #d1d5db; font-size: 12px; font-weight: 600; text-align: center; }
+</style>
+
+<div class="wrap">
+
+    <div class="page-header">
+        {% if view_mode %}
+            <h1>{{ dept_name }}</h1>
+            <p>Semester {{ selected.semester }} — {{ selected.exam_type|capitalize }} Exam Schedule</p>
+        {% else %}
+            <h1>Exam Timetable</h1>
+            <p>Generate a clash-free exam schedule from courses already in the database</p>
+        {% endif %}
+    </div>
+
+    {% if view_mode %}
+    <div class="view-banner">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        You're viewing a shared read-only exam schedule.
+        <a href="{{ url_for('exam_timetable') }}">Generate your own →</a>
+    </div>
+    {% else %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endwith %}
+
+    <!-- CONFIG FORM -->
+    <div class="card">
+        <h3>Exam Configuration</h3>
+        <form method="POST">
+
+            <div class="form-grid">
+                <div class="fg">
+                    <label>Department</label>
+                    <select name="dept_id" required>
+                        <option value="">Select Department</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.dept_id }}"
+                            {% if selected.dept_id == dept.dept_id|string %}selected{% endif %}>
+                            {{ dept.dept_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="fg">
+                    <label>Semester</label>
+                    <select name="semester" required>
+                        <option value="">Select Semester</option>
+                        {% for s in range(1, 11) %}
+                        <option value="{{ s }}"
+                            {% if selected.semester == s|string %}selected{% endif %}>
+                            Semester {{ s }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="fg">
+                    <label>Exam Start Date</label>
+                    <input type="date" name="start_date"
+                        value="{{ selected.start_date }}" required>
+                </div>
+
+                <div class="fg">
+                    <label>Exams Per Day</label>
+                    <select name="exams_per_day" required>
+                        <option value="1" {% if selected.exams_per_day == '1' %}selected{% endif %}>
+                            1 — Single session per day
+                        </option>
+                        <option value="2" {% if selected.exams_per_day == '2' %}selected{% endif %}>
+                            2 — FN and AN per day
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- EXAM TYPE -->
+            <div style="margin-bottom: 20px;">
+                <span class="section-label">Exam Type</span>
+                <div class="pill-group">
+                    <label class="pill">
+                        <input type="radio" name="exam_type" value="theory"
+                            {% if selected.exam_type == 'theory' or not selected.exam_type %}checked{% endif %}>
+                        Theory Only
+                    </label>
+                    <label class="pill">
+                        <input type="radio" name="exam_type" value="lab"
+                            {% if selected.exam_type == 'lab' %}checked{% endif %}>
+                        Lab Only
+                    </label>
+                    <label class="pill">
+                        <input type="radio" name="exam_type" value="both"
+                            {% if selected.exam_type == 'both' %}checked{% endif %}>
+                        Both Theory and Lab
+                    </label>
+                </div>
+            </div>
+
+            <!-- SESSIONS -->
+            <div style="margin-bottom: 20px;">
+                <span class="section-label">Available Sessions</span>
+                <div class="pill-group">
+                    <label class="pill">
+                        <input type="checkbox" name="sessions" value="FN"
+                            {% if 'FN' in selected.sessions %}checked{% endif %}>
+                        FN — Forenoon
+                    </label>
+                    <label class="pill">
+                        <input type="checkbox" name="sessions" value="AN"
+                            {% if 'AN' in selected.sessions %}checked{% endif %}>
+                        AN — Afternoon
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="gen-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                Generate Exam Timetable
+            </button>
+
+        </form>
+    </div>
+
+    {% endif %}{# end not view_mode #}
+
+    <!-- RESULT -->
+    {% if exam_schedule %}
+    <div class="tt-card">
+        <div class="tt-card-header">
+            <h2>{{ dept_name }} — Semester {{ selected.semester }} Exam Schedule</h2>
+
+            <div class="btn-group">
+                <!-- Copy PDF Link Button -->
+                <button class="copy-link-btn" id="copyLinkBtn" type="button">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                    Copy Link
+                </button>
+                <!-- Download PDF Button -->
+                <a class="pdf-btn" id="pdfLink" href="#" target="_blank">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download PDF
+                </a>
+            </div>
+        </div>
+
+        <div class="tt-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:40px; text-align:center;">#</th>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Session</th>
+                        <th>Course Name</th>
+                        <th>Code</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in exam_schedule %}
+                    <tr>
+                        <td class="row-num">{{ loop.index }}</td>
+                        <td class="date-td">{{ row.date }}</td>
+                        <td class="day-td">{{ row.day }}</td>
+                        <td>
+                            <span class="sess-badge sess-{{ row.session }}">{{ row.session }}</span>
+                        </td>
+                        <td style="font-weight:500; color:#1a1a2e;">{{ row.course_name }}</td>
+                        <td>
+                            <code style="background:#f3f4f6; padding:2px 8px; border-radius:4px; font-size:12px;">
+                                {{ row.course_code }}
+                            </code>
+                        </td>
+                        <td>
+                            <span class="type-badge type-{{ row.course_type }}">
+                                {{ row.course_type }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% elif submitted %}
+    <div class="tt-card">
+        <div class="no-data">No courses found for the selected filters. Please check your department, semester, and exam type.</div>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- Toast -->
+<div class="copy-toast" id="copyToast">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    PDF link copied!
+</div>
+
+<script>
+// Build exam PDF URL from Jinja2 values
+const examParams = new URLSearchParams({
+    dept_id:       "{{ selected.dept_id }}",
+    semester:      "{{ selected.semester }}",
+    start_date:    "{{ selected.start_date }}",
+    exams_per_day: "{{ selected.exams_per_day }}",
+    exam_type:     "{{ selected.exam_type }}",
+    sessions:      "{{ selected.sessions | join(',') }}"
+});
+
+const hasDept = "{{ selected.dept_id }}" && "{{ selected.semester }}";
+const pdfUrl  = hasDept
+    ? window.location.origin + "/exam-timetable/pdf?" + examParams.toString()
+    : "";
+
+// Set Download PDF button href
+const pdfLink = document.getElementById('pdfLink');
+if (pdfLink && pdfUrl) {
+    pdfLink.href = pdfUrl;
+}
+
+// Copy PDF link to clipboard
+const copyLinkBtn = document.getElementById('copyLinkBtn');
+const copyToast   = document.getElementById('copyToast');
+
+copyLinkBtn && copyLinkBtn.addEventListener('click', function () {
+    if (!pdfUrl) return;
+    navigator.clipboard.writeText(pdfUrl).then(() => {
+        copyToast.classList.add('show');
+        setTimeout(() => copyToast.classList.remove('show'), 2800);
+    }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = pdfUrl;
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        copyToast.classList.add('show');
+        setTimeout(() => copyToast.classList.remove('show'), 2800);
+    });
+});
+</script>
+
+{% endblock %}

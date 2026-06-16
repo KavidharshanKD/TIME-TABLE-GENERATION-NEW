@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .eg-page { width:92%; max-width:1100px; margin:36px auto 60px; }
+    .breadcrumb { display:flex; align-items:center; gap:8px; margin-bottom:28px; font-size:12.5px; color:rgba(255,255,255,0.35); }
+    .breadcrumb a { color:rgba(255,255,255,0.45); text-decoration:none; transition:color 0.2s; }
+    .breadcrumb a:hover { color:rgba(255,255,255,0.80); }
+    .breadcrumb-sep { opacity:0.3; }
+    .breadcrumb-current { color:rgba(255,255,255,0.70); font-weight:500; }
+
+    .page-head { display:flex; align-items:center; gap:16px; margin-bottom:28px; }
+    .page-head-icon { width:50px; height:50px; border-radius:14px; background:rgba(99,179,237,0.12); border:1px solid rgba(99,179,237,0.22); display:flex; align-items:center; justify-content:center; color:#7dd3fc; flex-shrink:0; }
+    .page-head h1 { font-family:'DM Serif Display',serif; font-size:28px; color:white; font-weight:400; margin-bottom:3px; }
+    .page-head p { font-size:13px; color:rgba(255,255,255,0.45); margin:0; }
+
+    .flash-list { list-style:none; margin-bottom:20px; }
+    .flash-item { padding:11px 16px; border-radius:9px; font-size:13px; font-weight:500; margin-bottom:8px; display:flex; align-items:flex-start; gap:9px; line-height:1.55; }
+    .flash-item.success { background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); color:#bbf7d0; }
+    .flash-item.error { background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.25); color:#fecaca; }
+
+    .info-banner { padding:13px 18px; border-radius:10px; margin-bottom:28px; background:rgba(99,179,237,0.08); border:1px solid rgba(99,179,237,0.18); font-size:13px; color:rgba(255,255,255,0.52); line-height:1.65; display:flex; align-items:flex-start; gap:10px; }
+    .info-banner svg { flex-shrink:0; margin-top:1px; color:#7dd3fc; }
+    .info-banner strong { color:rgba(255,255,255,0.80); }
+
+    .eg-layout { display:grid; grid-template-columns:300px 1fr; gap:24px; align-items:start; }
+    @media(max-width:820px){ .eg-layout{ grid-template-columns:1fr; } }
+
+    .glass-panel { background:rgba(15,18,40,0.52); border:1px solid rgba(255,255,255,0.10); border-radius:16px; backdrop-filter:blur(18px); overflow:hidden; margin-bottom:20px; }
+    .panel-head { padding:14px 22px; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; gap:10px; }
+    .panel-head-title { font-size:14px; font-weight:600; color:rgba(255,255,255,0.85); }
+    .panel-head-icon { color:rgba(255,255,255,0.35); }
+    .panel-body { padding:22px; }
+
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; font-size:11.5px; font-weight:700; color:rgba(255,255,255,0.45); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:7px; }
+    .form-input, .form-select { width:100%; padding:10px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:white; font-size:13.5px; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; box-sizing:border-box; }
+    .form-input::placeholder { color:rgba(255,255,255,0.28); }
+    .form-input:focus, .form-select:focus { border-color:rgba(99,179,237,0.45); background:rgba(255,255,255,0.09); }
+    .form-select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.35)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:36px; cursor:pointer; }
+    .form-select option { background:#1a1a2e; color:white; }
+
+    .btn-primary { width:100%; padding:11px; border-radius:9px; background:rgba(99,179,237,0.15); border:1px solid rgba(99,179,237,0.30); color:#7dd3fc; font-size:13.5px; font-weight:700; font-family:'DM Sans',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background 0.2s; }
+    .btn-primary:hover { background:rgba(99,179,237,0.25); }
+
+    /* Group cards */
+    .group-card { background:rgba(15,18,40,0.52); border:1px solid rgba(255,255,255,0.10); border-radius:14px; backdrop-filter:blur(14px); overflow:hidden; margin-bottom:20px; }
+    .group-card-head { padding:13px 18px; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .group-card-title { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .sem-badge { display:inline-flex; padding:2px 9px; border-radius:5px; font-size:11px; font-weight:700; background:rgba(99,179,237,0.12); color:#7dd3fc; border:1px solid rgba(99,179,237,0.20); }
+    .lab-badge { display:inline-flex; padding:2px 9px; border-radius:5px; font-size:11px; font-weight:700; background:rgba(52,211,153,0.12); color:#6ee7b7; border:1px solid rgba(52,211,153,0.28); gap:4px; align-items:center; }
+    .count-badge { display:inline-flex; padding:2px 9px; border-radius:5px; font-size:11px; font-weight:700; background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.40); border:1px solid rgba(255,255,255,0.10); }
+    .group-name-text { font-size:14px; font-weight:600; color:white; }
+
+    .btn-delete { padding:5px 10px; border-radius:7px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.22); color:#f87171; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:background 0.2s; font-family:'DM Sans',sans-serif; }
+    .btn-delete:hover { background:rgba(239,68,68,0.16); }
+
+    /* Options inside card */
+    .group-body { padding:16px 18px; }
+    .section-label { font-size:10.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,0.28); margin-bottom:10px; }
+
+    .option-list { display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+    .option-row { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:10px 14px; }
+    .option-header { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:6px; }
+    .option-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .option-index { width:20px; height:20px; border-radius:5px; background:rgba(99,179,237,0.12); color:#7dd3fc; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .option-name { font-size:13.5px; color:rgba(255,255,255,0.85); font-weight:600; }
+    .option-code-tag { font-size:11px; font-weight:700; padding:2px 8px; border-radius:5px; background:rgba(99,179,237,0.10); color:#7dd3fc; border:1px solid rgba(99,179,237,0.18); font-family:monospace; letter-spacing:0.5px; }
+    .option-credits-tag { font-size:11px; font-weight:700; padding:2px 8px; border-radius:5px; background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.45); border:1px solid rgba(255,255,255,0.10); }
+    .option-actions { display:flex; gap:6px; flex-shrink:0; }
+
+    /* Edit form inline */
+    .edit-form { margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06); display:none; }
+    .edit-form.open { display:block; }
+    .edit-grid { display:grid; grid-template-columns:1fr 1fr auto auto; gap:8px; align-items:end; }
+    @media(max-width:600px){ .edit-grid{ grid-template-columns:1fr 1fr; } }
+    .edit-input { padding:8px 11px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.14); border-radius:7px; color:white; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; width:100%; box-sizing:border-box; }
+    .edit-input::placeholder { color:rgba(255,255,255,0.25); }
+    .edit-input:focus { border-color:rgba(99,179,237,0.45); }
+    .btn-save { padding:8px 14px; border-radius:7px; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.28); color:#4ade80; font-size:12.5px; font-weight:700; font-family:'DM Sans',sans-serif; cursor:pointer; white-space:nowrap; transition:background 0.2s; }
+    .btn-save:hover { background:rgba(34,197,94,0.22); }
+    .btn-cancel-edit { padding:8px 12px; border-radius:7px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.45); font-size:12.5px; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; white-space:nowrap; transition:background 0.2s; }
+    .btn-cancel-edit:hover { background:rgba(255,255,255,0.10); }
+    .btn-edit { padding:5px 10px; border-radius:7px; background:rgba(99,179,237,0.08); border:1px solid rgba(99,179,237,0.22); color:#7dd3fc; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:background 0.2s; font-family:'DM Sans',sans-serif; }
+    .btn-edit:hover { background:rgba(99,179,237,0.18); }
+
+    /* Add form */
+    .add-option-section { margin-top:12px; }
+    .add-option-grid { display:grid; grid-template-columns:1fr 120px 70px auto; gap:8px; align-items:end; }
+    @media(max-width:600px){ .add-option-grid{ grid-template-columns:1fr 1fr; } }
+    .add-opt-input { padding:9px 12px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:7px; color:white; font-size:13px; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; width:100%; box-sizing:border-box; }
+    .add-opt-input::placeholder { color:rgba(255,255,255,0.28); }
+    .add-opt-input:focus { border-color:rgba(99,179,237,0.45); }
+    .btn-add { padding:9px 16px; border-radius:7px; background:rgba(99,179,237,0.12); border:1px solid rgba(99,179,237,0.25); color:#7dd3fc; font-size:13px; font-weight:700; font-family:'DM Sans',sans-serif; cursor:pointer; white-space:nowrap; transition:background 0.2s; flex-shrink:0; }
+    .btn-add:hover { background:rgba(99,179,237,0.22); }
+
+    .field-label-sm { display:block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,255,255,0.30); margin-bottom:5px; }
+    .max-note { font-size:12px; color:rgba(236,179,101,0.70); background:rgba(236,179,101,0.07); border:1px solid rgba(236,179,101,0.15); border-radius:6px; padding:7px 11px; }
+    .empty-note { font-size:12.5px; color:rgba(255,255,255,0.28); font-style:italic; margin-bottom:10px; }
+
+    /* is_lab toggle */
+    .toggle-row { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .toggle-label { font-size:12px; color:rgba(255,255,255,0.55); cursor:pointer; user-select:none; }
+    .toggle-switch { position:relative; display:inline-block; width:36px; height:20px; flex-shrink:0; }
+    .toggle-switch input { opacity:0; width:0; height:0; position:absolute; }
+    .toggle-track { position:absolute; inset:0; background:rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.15); border-radius:20px; cursor:pointer; transition:background 0.25s, border-color 0.25s; }
+    .toggle-track::after { content:''; position:absolute; left:3px; top:50%; transform:translateY(-50%); width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.45); transition:left 0.22s,background 0.22s; }
+    .toggle-switch input:checked + .toggle-track { background:rgba(52,211,153,0.25); border-color:rgba(52,211,153,0.50); }
+    .toggle-switch input:checked + .toggle-track::after { left:19px; background:#6ee7b7; }
+    .lab-note { font-size:11.5px; color:rgba(110,231,183,0.70); background:rgba(52,211,153,0.07); border:1px solid rgba(52,211,153,0.15); border-radius:6px; padding:7px 11px; margin-top:-6px; margin-bottom:12px; display:none; }
+    .lab-note.visible { display:block; }
+
+    .no-groups-empty { padding:36px; text-align:center; font-size:13px; color:rgba(255,255,255,0.30); }
+</style>
+
+<div class="eg-page">
+
+    <div class="breadcrumb">
+        <a href="{{ url_for('courses_home') }}">Courses</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="{{ url_for('courses', dept_id=dept_id) }}">{{ dept.dept_name }}</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-current">Elective Groups</span>
+    </div>
+
+    <div class="page-head">
+        <div class="page-head-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="5" r="3"/><line x1="12" y1="8" x2="12" y2="12"/>
+                <circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/>
+                <line x1="9" y1="13" x2="6" y2="15"/><line x1="15" y1="13" x2="18" y2="15"/>
+            </svg>
+        </div>
+        <div>
+            <h1>Elective Groups</h1>
+            <p>{{ dept.dept_name }} — Semester 5 onwards</p>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flash-list">
+        {% for cat, msg in messages %}
+        <li class="flash-item {{ cat }}"><span>{{ msg }}</span></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <div class="info-banner">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span>Create an elective group per semester, then add <strong>1 or 2 subjects</strong> with their
+        <strong>course name, course code, and credits</strong>. Both subjects share the same timetable slot.
+        Enable <strong>Lab Elective</strong> if the group should be scheduled as a 2-period consecutive lab block (same rules as normal lab sessions).</span>
+    </div>
+
+    <div class="eg-layout">
+
+        <!-- LEFT: Create group -->
+        <div>
+            <div class="glass-panel">
+                <div class="panel-head">
+                    <span class="panel-head-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="16"/>
+                            <line x1="8" y1="12" x2="16" y2="12"/>
+                        </svg>
+                    </span>
+                    <span class="panel-head-title">Create Elective Group</span>
+                </div>
+                <div class="panel-body">
+                    <form method="POST">
+                        <input type="hidden" name="action" value="add_group">
+                        <div class="form-group">
+                            <label>Group Name</label>
+                            <input type="text" name="group_name" class="form-input"
+                                placeholder="e.g. Elective I, Open Elective A" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Semester</label>
+                            <select name="semester" class="form-select" required>
+                                {% for s in range(5,11) %}
+                                <option value="{{ s }}">Semester {{ s }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!-- Lab Elective Toggle -->
+                        <div class="toggle-row">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="isLabToggle" name="is_lab" value="1"
+                                    onchange="document.getElementById('labNote').classList.toggle('visible',this.checked)">
+                                <span class="toggle-track"></span>
+                            </label>
+                            <span class="toggle-label" onclick="var t=document.getElementById('isLabToggle');t.checked=!t.checked;document.getElementById('labNote').classList.toggle('visible',t.checked)">
+                                Lab Elective <span style="font-size:10px;color:rgba(255,255,255,0.30);">(2 consecutive periods)</span>
+                            </span>
+                        </div>
+                        <div class="lab-note" id="labNote">
+                            🧪 This group will be scheduled as a <strong>lab session</strong> — two consecutive periods (same rules as normal labs: starts at period 3+, avoids breaks between periods).
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="16"/>
+                                <line x1="8" y1="12" x2="16" y2="12"/>
+                            </svg>
+                            Create Group
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Group cards -->
+        <div>
+            {% if not groups %}
+            <div class="glass-panel">
+                <div class="no-groups-empty">No elective groups yet. Create one using the form.</div>
+            </div>
+            {% endif %}
+
+            {% for g in groups %}
+            {% set opts = options_by_group.get(g.group_id, []) %}
+            <div class="group-card">
+
+                <div class="group-card-head">
+                    <div class="group-card-title">
+                        <span class="sem-badge">Sem {{ g.semester }}</span>
+                        {% if g.is_lab %}
+                        <span class="lab-badge">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 3h6l3 9H6z"/><rect x="4" y="18" width="16" height="3" rx="1"/>
+                            </svg>
+                            Lab
+                        </span>
+                        {% endif %}
+                        <span class="group-name-text">{{ g.group_name }}</span>
+                        <span class="count-badge">{{ opts|length }}/2 subjects</span>
+                    </div>
+                    <form method="POST"
+                        onsubmit="return confirm('Delete this group and all its subjects?')">
+                        <input type="hidden" name="action" value="delete_group">
+                        <input type="hidden" name="group_id" value="{{ g.group_id }}">
+                        <button type="submit" class="btn-delete">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                <path d="M10 11v6"/><path d="M14 11v6"/>
+                                <path d="M9 6V4h6v2"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="group-body">
+                    <div class="section-label">Elective Subjects</div>
+
+                    {% if opts %}
+                    <div class="option-list">
+                        {% for opt in opts %}
+                        <div class="option-row" id="opt-row-{{ opt.option_id }}">
+                            <div class="option-header">
+                                <div class="option-meta">
+                                    <span class="option-index">{{ loop.index }}</span>
+                                    <span class="option-name">{{ opt.option_name }}</span>
+                                    <span class="option-code-tag">{{ opt.option_code or '—' }}</span>
+                                    <span class="option-credits-tag">{{ opt.option_credits or 3 }} cr</span>
+                                </div>
+                                <div class="option-actions">
+                                    <button type="button" class="btn-edit"
+                                        onclick="toggleEdit('{{ opt.option_id }}')" title="Edit subject">
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                        </svg>
+                                    </button>
+                                    <form method="POST" style="display:inline;"
+                                        onsubmit="return confirm('Remove this subject?')">
+                                        <input type="hidden" name="action" value="delete_option">
+                                        <input type="hidden" name="option_id" value="{{ opt.option_id }}">
+                                        <button type="submit" class="btn-delete" style="padding:5px 8px"
+                                            title="Remove subject">
+                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                                <line x1="6" y1="6" x2="18" y2="18"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Inline edit form -->
+                            <div class="edit-form" id="edit-form-{{ opt.option_id }}">
+                                <form method="POST">
+                                    <input type="hidden" name="action" value="update_option">
+                                    <input type="hidden" name="option_id" value="{{ opt.option_id }}">
+                                    <div class="edit-grid">
+                                        <div>
+                                            <span class="field-label-sm">Course Name</span>
+                                            <input type="text" name="option_name" class="edit-input"
+                                                value="{{ opt.option_name }}" placeholder="Course name" required>
+                                        </div>
+                                        <div>
+                                            <span class="field-label-sm">Course Code</span>
+                                            <input type="text" name="option_code" class="edit-input"
+                                                value="{{ opt.option_code or '' }}" placeholder="e.g. CS501">
+                                        </div>
+                                        <div>
+                                            <span class="field-label-sm">Credits</span>
+                                            <input type="number" name="option_credits" class="edit-input"
+                                                value="{{ opt.option_credits or 3 }}" min="1" max="6" style="width:70px">
+                                        </div>
+                                        <div style="display:flex;gap:6px;align-self:end;">
+                                            <button type="submit" class="btn-save">Save</button>
+                                            <button type="button" class="btn-cancel-edit"
+                                                onclick="toggleEdit('{{ opt.option_id }}')">✕</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="empty-note">No subjects added yet.</p>
+                    {% endif %}
+
+                    {% if opts|length < 2 %}
+                    <div class="add-option-section">
+                        <div class="section-label" style="margin-bottom:8px;">Add Subject</div>
+                        <form method="POST">
+                            <input type="hidden" name="action" value="add_option">
+                            <input type="hidden" name="group_id" value="{{ g.group_id }}">
+                            <div class="add-option-grid">
+                                <div>
+                                    <span class="field-label-sm">Course Name</span>
+                                    <input type="text" name="option_name" class="add-opt-input"
+                                        placeholder="e.g. Data Mining" required>
+                                </div>
+                                <div>
+                                    <span class="field-label-sm">Course Code</span>
+                                    <input type="text" name="option_code" class="add-opt-input"
+                                        placeholder="e.g. CS501">
+                                </div>
+                                <div>
+                                    <span class="field-label-sm">Credits</span>
+                                    <input type="number" name="option_credits" class="add-opt-input"
+                                        placeholder="3" value="3" min="1" max="6" style="width:70px">
+                                </div>
+                                <div style="align-self:end;">
+                                    <button type="submit" class="btn-add">+ Add</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="max-note">⚠ Maximum 2 subjects reached.</div>
+                    {% endif %}
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleEdit(optId) {
+    const form = document.getElementById('edit-form-' + optId);
+    if (form) form.classList.toggle('open');
+}
+</script>
+
+{% endblock %}

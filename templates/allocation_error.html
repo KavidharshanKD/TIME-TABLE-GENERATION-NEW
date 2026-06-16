@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Form Unavailable</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #0d0f20 0%, #141728 60%, #1a1830 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 16px;
+            color: white;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 30% 30%, rgba(251, 191, 36, 0.06) 0%, transparent 55%),
+                radial-gradient(ellipse at 70% 70%, rgba(200, 75, 49, 0.06) 0%, transparent 55%);
+            pointer-events: none;
+        }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            background: rgba(15, 18, 40, 0.60);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 20px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 48px 40px 40px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+            animation: cardIn 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.5), transparent);
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .icon-ring {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(251, 191, 36, 0.10);
+            border: 1px solid rgba(251, 191, 36, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            animation: iconPop 0.5s 0.2s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+        }
+
+        @keyframes iconPop {
+            from {
+                transform: scale(0.6);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .icon-ring svg {
+            color: #fbbf24;
+        }
+
+        h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 26px;
+            color: white;
+            font-weight: 400;
+            margin-bottom: 12px;
+            animation: fadeUp 0.5s 0.3s ease both;
+        }
+
+        .message {
+            font-size: 14.5px;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.70;
+            margin-bottom: 24px;
+            animation: fadeUp 0.5s 0.35s ease both;
+        }
+
+        .contact-note {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.25);
+            animation: fadeUp 0.5s 0.42s ease both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+
+        <div class="icon-ring">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+        </div>
+
+        <h2>Form Unavailable</h2>
+
+        <p class="message">{{ message }}</p>
+
+        <p class="contact-note">If you think this is a mistake, please contact your administrator.</p>
+
+    </div>
+</body>
+
+</html>

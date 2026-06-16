@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.role-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 120px);
+    padding: 40px 24px;
+}
+
+.role-box {
+    text-align: center;
+    animation: fadeUp 0.6s ease both;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.role-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #ecb365;
+    margin-bottom: 16px;
+}
+
+.role-box h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(30px, 5vw, 46px);
+    color: white;
+    font-weight: 400;
+    margin-bottom: 48px;
+    letter-spacing: -0.3px;
+}
+
+.role-cards {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.role-card {
+    background: rgba(255,255,255,0.96);
+    border-radius: 16px;
+    padding: 40px 36px;
+    width: 240px;
+    text-decoration: none;
+    color: #1a1a2e;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+    border: 2px solid transparent;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    animation: fadeUp 0.6s ease both;
+}
+
+.role-card:nth-child(1) { animation-delay: 0.15s; }
+.role-card:nth-child(2) { animation-delay: 0.25s; }
+
+.role-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 48px rgba(0,0,0,0.22);
+}
+
+.role-card:nth-child(1):hover { border-color: #4e73df; }
+.role-card:nth-child(2):hover { border-color: #1cc88a; }
+
+.role-icon {
+    width: 60px; height: 60px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.role-icon-student { background: linear-gradient(135deg, #4e73df, #6f86e0); }
+.role-icon-faculty  { background: linear-gradient(135deg, #1cc88a, #17a673); }
+
+.role-card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 8px;
+    color: #1a1a2e;
+}
+
+.role-card p {
+    font-size: 13.5px;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.role-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #9ca3af;
+    transition: color 0.2s, gap 0.2s;
+}
+
+.role-card:hover .role-arrow { gap: 10px; }
+.role-card:nth-child(1):hover .role-arrow { color: #4e73df; }
+.role-card:nth-child(2):hover .role-arrow { color: #1cc88a; }
+</style>
+
+<div class="role-wrapper">
+    <div class="role-box">
+        <div class="role-tag">Welcome</div>
+        <h1>Choose Your Role</h1>
+
+        <div class="role-cards">
+            <a href="{{ url_for('student') }}" class="role-card">
+                <div class="role-icon role-icon-student">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                    </svg>
+                </div>
+                <h2>Student</h2>
+                <p>View your class timetable by department and semester</p>
+                <div class="role-arrow">
+                    View Timetable
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </a>
+
+            <a href="{{ url_for('faculty') }}" class="role-card">
+                <div class="role-icon role-icon-faculty">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <h2>Faculty</h2>
+                <p>View your personal teaching schedule across all classes</p>
+                <div class="role-arrow">
+                    View Schedule
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+html, body { overflow-y: auto !important; }
+
+.wrap { width: 92%; max-width: 1100px; margin: 44px auto 80px; }
+
+.page-header { margin-bottom: 28px; animation: fadeUp 0.5s ease both; }
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-header h1 { font-family: 'DM Serif Display', serif; font-size: 34px; color: white; font-weight: 400; letter-spacing: -0.3px; margin-bottom: 4px; }
+.page-header p  { color: rgba(255,255,255,0.55); font-size: 14.5px; }
+
+/* ALERTS */
+.alert { padding: 14px 20px; border-radius: 10px; margin-bottom: 22px; font-weight: 500; display: flex; align-items: center; gap: 10px; font-size: 14px; animation: fadeUp 0.4s ease both; }
+.alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+.alert-error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+.no-settings {
+    background: rgba(255,243,205,0.95); color: #92400e;
+    border: 1px solid #fbbf24; border-radius: 10px;
+    padding: 14px 20px; margin-bottom: 22px; font-weight: 500; font-size: 14px;
+    display: flex; align-items: center; gap: 10px;
+}
+
+.no-settings a { color: #92400e; font-weight: 700; }
+
+/* CARD */
+.card {
+    background: rgba(255,255,255,0.96) !important;
+    border-radius: 14px; padding: 28px 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    margin-bottom: 22px;
+    animation: fadeUp 0.5s ease both;
+}
+
+.card h3 { font-family: 'DM Serif Display', serif; font-size: 18px; color: #1a1a2e; font-weight: 400; margin-bottom: 20px; }
+
+/* DEPT CHECKBOXES */
+.dept-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+
+.dept-check {
+    display: flex; align-items: center; gap: 8px;
+    background: #f3f4f8; padding: 9px 16px; border-radius: 8px;
+    cursor: pointer; font-size: 13.5px; font-weight: 600; color: #4b5563;
+    border: 2px solid transparent; transition: all 0.2s; user-select: none;
+}
+
+.dept-check input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; }
+.dept-check:has(input:checked) { background: #1a1a2e; color: white; border-color: #1a1a2e; }
+
+/* SEM TYPE */
+.sem-section { margin-bottom: 24px; }
+.sem-section p { font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 12px; }
+.sem-options { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.sem-lbl {
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    background: #f3f4f8; padding: 10px 22px; border-radius: 8px;
+    font-size: 13.5px; font-weight: 600; color: #4b5563;
+    border: 2px solid transparent; transition: all 0.2s; user-select: none;
+}
+
+.sem-lbl input { width: 14px; height: 14px; cursor: pointer; }
+.sem-lbl.active { background: #1a1a2e; color: white; border-color: #1a1a2e; }
+.sem-lbl.active .sem-sub { color: rgba(255,255,255,0.55) !important; }
+.sem-sub { color: #9ca3af; font-size: 12px; font-weight: 400; }
+
+/* BUTTONS */
+.btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+.gen-btn {
+    background: linear-gradient(135deg, #c84b31, #e05a38);
+    color: white; border: none;
+    padding: 12px 30px; font-size: 14.5px; font-weight: 600;
+    border-radius: 8px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: transform 0.2s, box-shadow 0.3s;
+    display: inline-flex; align-items: center; gap: 8px;
+}
+
+.gen-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(200,75,49,0.4); }
+
+.sel-btn {
+    background: #f3f4f8; color: #374151; border: none;
+    padding: 11px 20px; font-size: 13.5px; font-weight: 600;
+    border-radius: 8px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s;
+}
+
+.sel-btn:hover { background: #e5e7eb; }
+
+/* SUCCESS BOX */
+.success-box {
+    background: rgba(255,255,255,0.96);
+    border-radius: 14px; padding: 44px 40px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+    animation: fadeUp 0.5s 0.1s ease both;
+}
+
+.success-icon {
+    width: 64px; height: 64px;
+    background: #d1fae5; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+}
+
+.success-icon svg { color: #065f46; }
+
+.success-box h2 { font-family: 'DM Serif Display', serif; font-size: 24px; color: #1a1a2e; font-weight: 400; margin-bottom: 8px; }
+.success-box p  { color: #6b7280; font-size: 14.5px; margin-bottom: 28px; }
+
+.success-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+.sa-btn {
+    padding: 12px 28px; border-radius: 8px;
+    text-decoration: none; font-weight: 600; font-size: 14px;
+    transition: transform 0.2s, opacity 0.2s;
+    display: inline-flex; align-items: center; gap: 7px;
+}
+
+.sa-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+.sa-dark { background: #1a1a2e; color: white; }
+.sa-mid  { background: #6b7280; color: white; }
+
+.no-tt { text-align: center; color: rgba(255,255,255,0.45); padding: 30px; font-size: 15px; }
+</style>
+
+<div class="wrap">
+    <div class="page-header">
+        <h1>Timetable Generator</h1>
+        <p>Select departments and semester type, then generate. Faculty clash prevention is automatic.</p>
+    </div>
+
+    {% if not settings %}
+    <div class="no-settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        No timetable settings configured yet.
+        <a href="{{ url_for('details') }}">Go to Settings</a>
+    </div>
+    {% endif %}
+
+    {% if result_message %}
+    <div class="alert alert-{{ result_type }}">
+        {% if result_type == 'success' %}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        {% else %}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+        {% endif %}
+        {{ result_message }}
+    </div>
+    {% endif %}
+
+    <!-- GENERATE FORM -->
+    <div class="card" style="animation-delay: 0.05s">
+        <h3>Select Departments &amp; Semester Type</h3>
+        <form method="POST" id="gen-form">
+            <div class="dept-grid">
+                {% for dept in all_departments %}
+                <label class="dept-check">
+                    <input type="checkbox" name="selected_depts" value="{{ dept.dept_id }}"
+                        {% if dept.dept_id in selected_dept_ids %}checked{% endif %}>
+                    {{ dept.dept_name }}
+                </label>
+                {% endfor %}
+            </div>
+            <div class="btn-row">
+                <button type="button" class="sel-btn" onclick="toggleAll()">Select / Deselect All</button>
+            </div><br>
+
+            <div class="sem-section">
+                <p>Semester Type</p>
+                <div class="sem-options">
+                    <label class="sem-lbl" id="lbl-odd">
+                        <input type="radio" name="semester_type" value="odd"
+                            {% if semester_type == "odd" or not semester_type %}checked{% endif %}
+                            onchange="highlightSemType()">
+                        Odd Semesters &nbsp;<span class="sem-sub">(1, 3, 5, 7 …)</span>
+                    </label>
+                    <label class="sem-lbl" id="lbl-even">
+                        <input type="radio" name="semester_type" value="even"
+                            {% if semester_type == "even" %}checked{% endif %}
+                            onchange="highlightSemType()">
+                        Even Semesters &nbsp;<span class="sem-sub">(2, 4, 6, 8 …)</span>
+                    </label>
+                </div>
+            </div>
+
+            
+                <button type="submit" class="gen-btn">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    Generate Timetable
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- RESULT -->
+    {% if result_type == "success" %}
+    <div class="success-box">
+        <div class="success-icon">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <h2>Timetable Generated</h2>
+        <p>
+            <strong>{{ semester_type | capitalize }}</strong> semester timetable created for
+            <strong>{{ selected_dept_ids | length }}</strong> department(s).
+        </p>
+        <div class="success-actions">
+            <a href="{{ url_for('student') }}" class="sa-btn sa-dark">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                Student Timetable
+            </a>
+            <a href="{{ url_for('faculty') }}" class="sa-btn sa-mid">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Faculty Timetable
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="no-tt">Select departments, choose semester type, and click Generate.</div>
+    {% endif %}
+</div>
+
+<script>
+function toggleAll() {
+    const boxes = document.querySelectorAll('input[name="selected_depts"]');
+    const anyUnchecked = Array.from(boxes).some(b => !b.checked);
+    boxes.forEach(b => b.checked = anyUnchecked);
+}
+
+function highlightSemType() {
+    document.getElementById("lbl-odd").classList.toggle(
+        "active", document.querySelector('input[name="semester_type"][value="odd"]').checked
+    );
+    document.getElementById("lbl-even").classList.toggle(
+        "active", document.querySelector('input[name="semester_type"][value="even"]').checked
+    );
+}
+
+window.addEventListener("DOMContentLoaded", highlightSemType);
+</script>
+
+{% endblock %}

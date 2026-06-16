@@ -1,0 +1,850 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    html,
+    body {
+        overflow-y: auto !important;
+    }
+
+    .wrap {
+        width: 88%;
+        max-width: 960px;
+        margin: 44px auto 80px;
+    }
+
+    .page-header {
+        margin-bottom: 28px;
+        animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .breadcrumb {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 10px;
+    }
+
+    .breadcrumb a {
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+        color: white;
+    }
+
+    .breadcrumb span {
+        color: rgba(255, 255, 255, 0.3);
+        margin: 0 6px;
+    }
+
+    .page-header h1 {
+        font-family: 'DM Serif Display', serif;
+        font-size: 34px;
+        color: white;
+        font-weight: 400;
+        letter-spacing: -0.3px;
+    }
+
+    /* ── Add card ── */
+    .add-card {
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 14px;
+        padding: 26px 28px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 22px;
+        animation: fadeUp 0.5s 0.1s ease both;
+    }
+
+    .add-card h3 {
+        font-family: 'DM Serif Display', serif;
+        font-size: 17px;
+        color: #1a1a2e;
+        font-weight: 400;
+        margin-bottom: 16px;
+    }
+
+    .form-row-top {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .form-row-top input[type="text"],
+    .form-row-top input[type="email"] {
+        flex: 1;
+        min-width: 180px;
+        padding: 10px 14px;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: 'DM Sans', sans-serif;
+        color: #1a1a2e;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-row-top input[type="text"]:focus,
+    .form-row-top input[type="email"]:focus {
+        outline: none;
+        border-color: #2d3561;
+        box-shadow: 0 0 0 3px rgba(45, 53, 97, 0.1);
+    }
+
+    .email-note {
+        font-size: 11.5px;
+        color: #9ca3af;
+        margin-top: -6px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .type-toggle {
+        display: flex;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .type-toggle label {
+        padding: 10px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        color: #6b7280;
+        background: white;
+        transition: background 0.2s, color 0.2s;
+        user-select: none;
+    }
+
+    .type-toggle input[type="radio"] {
+        display: none;
+    }
+
+    .type-toggle input[type="radio"]:checked+label {
+        background: #1a1a2e;
+        color: white;
+    }
+
+    .type-toggle label:first-of-type {
+        border-right: 1px solid #e5e7eb;
+    }
+
+    .visiting-days-row {
+        display: none;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 14px 16px;
+        background: #f8f9ff;
+        border: 1.5px solid #e0e4f8;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        animation: fadeUp 0.3s ease both;
+    }
+
+    .visiting-days-row.visible {
+        display: flex;
+    }
+
+    .visiting-days-row .label-text {
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        margin-right: 4px;
+        white-space: nowrap;
+    }
+
+    .day-chip {
+        position: relative;
+    }
+
+    .day-chip input[type="checkbox"] {
+        display: none;
+    }
+
+    .day-chip label {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 100px;
+        border: 1.5px solid #d1d5db;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #6b7280;
+        background: white;
+        cursor: pointer;
+        transition: all 0.18s;
+        user-select: none;
+    }
+
+    .day-chip input[type="checkbox"]:checked+label {
+        background: #2d3561;
+        border-color: #2d3561;
+        color: white;
+    }
+
+    .form-row-bottom {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .add-btn {
+        background: #1a1a2e;
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: background 0.2s, transform 0.15s;
+        white-space: nowrap;
+    }
+
+    .add-btn:hover {
+        background: #2d3561;
+        transform: translateY(-1px);
+    }
+
+    /* ── Table card ── */
+    .table-card {
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        animation: fadeUp 0.5s 0.2s ease both;
+    }
+
+    .table-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid #f0f1f5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .table-header span {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a1a2e;
+    }
+
+    .count-badge {
+        background: #f3f4f8;
+        color: #6b7280;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 100px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead th {
+        background: #1a1a2e;
+        color: rgba(255, 255, 255, 0.75);
+        padding: 12px 20px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #f3f4f6;
+        transition: background 0.15s;
+    }
+
+    tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    tbody tr:hover {
+        background: #f9faff;
+    }
+
+    tbody td {
+        padding: 13px 20px;
+        font-size: 14px;
+        color: #374151;
+        vertical-align: middle;
+    }
+
+    .fac-avatar {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #1a1a2e, #2d3561);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'DM Serif Display', serif;
+        color: #ecb365;
+        font-size: 13px;
+        margin-right: 10px;
+        vertical-align: middle;
+        flex-shrink: 0;
+    }
+
+    .fac-name {
+        font-weight: 500;
+        color: #1a1a2e;
+        vertical-align: middle;
+    }
+
+    /* email chip in table */
+    .email-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12.5px;
+        color: #4b5563;
+        background: #f3f4f8;
+        padding: 3px 10px;
+        border-radius: 100px;
+        border: 1px solid #e5e7eb;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .email-chip svg {
+        flex-shrink: 0;
+        color: #9ca3af;
+    }
+
+    .no-email {
+        font-size: 12.5px;
+        color: #d1d5db;
+        font-style: italic;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 100px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-regular {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .badge-visiting {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    .badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        display: inline-block;
+    }
+
+    .days-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 3px;
+    }
+
+    .day-pill-sm {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 100px;
+        background: #eff3ff;
+        color: #3730a3;
+        border: 1px solid #c7d2fe;
+    }
+
+    /* ── Action buttons ── */
+    .actions-cell {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-del,
+    .btn-edit {
+        padding: 7px 14px;
+        border-radius: 6px;
+        font-size: 12.5px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: background 0.2s, transform 0.15s;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .btn-del {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .btn-del:hover {
+        background: #fee2e2;
+        transform: translateY(-1px);
+    }
+
+    .btn-edit {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    .btn-edit:hover {
+        background: #dbeafe;
+        transform: translateY(-1px);
+    }
+
+    /* ── Inline edit form ── */
+    .edit-row {
+        display: none;
+        background: #f8f9ff;
+    }
+
+    .edit-row.open {
+        display: table-row;
+    }
+
+    .edit-inner {
+        padding: 16px 20px;
+        border-top: 1px dashed #c7d2fe;
+    }
+
+    .edit-inner form {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .edit-field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        flex: 1;
+        min-width: 160px;
+    }
+
+    .edit-field-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .edit-input {
+        padding: 9px 13px;
+        border: 1.5px solid #c7d2fe;
+        border-radius: 7px;
+        font-size: 14px;
+        font-family: 'DM Sans', sans-serif;
+        color: #1a1a2e;
+        background: white;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        width: 100%;
+    }
+
+    .edit-input:focus {
+        outline: none;
+        border-color: #2d3561;
+        box-shadow: 0 0 0 3px rgba(45, 53, 97, 0.1);
+    }
+
+    .edit-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        padding-bottom: 1px;
+    }
+
+    .btn-save {
+        padding: 9px 20px;
+        border-radius: 7px;
+        background: #1a1a2e;
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: background 0.2s, transform 0.15s;
+        white-space: nowrap;
+    }
+
+    .btn-save:hover {
+        background: #2d3561;
+        transform: translateY(-1px);
+    }
+
+    .btn-cancel-edit {
+        padding: 9px 14px;
+        border-radius: 7px;
+        background: #f3f4f8;
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+        transition: background 0.2s;
+        white-space: nowrap;
+    }
+
+    .btn-cancel-edit:hover {
+        background: #e5e7eb;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 50px 24px;
+        color: #9ca3af;
+        font-size: 15px;
+    }
+
+    /* ── Toast ── */
+    .toast {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: #1a1a2e;
+        color: white;
+        padding: 10px 22px;
+        border-radius: 100px;
+        font-size: 13.5px;
+        font-weight: 600;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s, transform 0.25s;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+</style>
+
+<div class="wrap">
+    <div class="page-header">
+        <div class="breadcrumb">
+            <a href="{{ url_for('faculty_home') }}">Faculty</a>
+            <span>/</span>
+            {{ dept_name }}
+        </div>
+        <h1>{{ dept_name }}</h1>
+    </div>
+
+    <!-- Add Faculty Card -->
+    <div class="add-card">
+        <h3>Add Faculty Member</h3>
+        <form method="POST" id="addFacultyForm">
+
+            <div class="form-row-top">
+                <input type="text" name="faculty_name" placeholder="Full name" required>
+                <input type="email" name="faculty_email" placeholder="Email address (for allocation forms)">
+                <div class="type-toggle">
+                    <input type="radio" name="faculty_type" id="type_regular" value="regular" checked>
+                    <label for="type_regular">Regular</label>
+                    <input type="radio" name="faculty_type" id="type_visiting" value="visiting">
+                    <label for="type_visiting">Visiting</label>
+                </div>
+            </div>
+
+            <p class="email-note">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                Email is used to automatically send allocation form links during faculty preference rounds.
+            </p>
+
+            <div class="visiting-days-row" id="visitingDaysRow">
+                <span class="label-text">Available days:</span>
+                {% set all_days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] %}
+                {% for day in all_days %}
+                <div class="day-chip">
+                    <input type="checkbox" name="visiting_days" id="vday_{{ day }}" value="{{ day }}">
+                    <label for="vday_{{ day }}">{{ day }}</label>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-row-bottom">
+                <button class="add-btn" type="submit">Add Faculty</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Faculty Table -->
+    <div class="table-card">
+        <div class="table-header">
+            <span>Faculty Members</span>
+            <span class="count-badge">{{ faculties | length }} total</span>
+        </div>
+
+        {% if faculties %}
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Faculty Name</th>
+                    <th>Email</th>
+                    <th>Type</th>
+                    <th>Visiting Days</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in faculties %}
+                <tr id="row-{{ f.faculty_id }}">
+                    <td style="font-weight:700; color:#1a1a2e;">#{{ f.faculty_id }}</td>
+                    <td>
+                        <span class="fac-avatar" id="avatar-{{ f.faculty_id }}">{{ f.faculty_name[0] | upper }}</span>
+                        <span class="fac-name" id="name-{{ f.faculty_id }}">{{ f.faculty_name }}</span>
+                    </td>
+                    <td id="email-cell-{{ f.faculty_id }}">
+                        {% if f.faculty_email %}
+                        <span class="email-chip">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                <polyline points="22,6 12,13 2,6" />
+                            </svg>
+                            {{ f.faculty_email }}
+                        </span>
+                        {% else %}
+                        <span class="no-email">Not set</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if f.faculty_type == 'visiting' %}
+                        <span class="badge badge-visiting"><span class="badge-dot"></span> Visiting</span>
+                        {% else %}
+                        <span class="badge badge-regular"><span class="badge-dot"></span> Regular</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if f.faculty_type == 'visiting' and f.visiting_days %}
+                        <div class="days-list">
+                            {% for day in f.visiting_days.split(',') %}
+                            {% if day.strip() %}<span class="day-pill-sm">{{ day.strip() }}</span>{% endif %}
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <span style="color:#9ca3af; font-size:13px;">All days</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="actions-cell">
+                            <button class="btn-edit"
+                                onclick="toggleEdit({{ f.faculty_id }}, '{{ f.faculty_name | e }}', '{{ f.faculty_email | e }}')"
+                                id="edit-btn-{{ f.faculty_id }}">
+                                ✏️ Edit
+                            </button>
+                            <a href="{{ url_for('delete_faculty', faculty_id=f.faculty_id, dept_id=dept_id) }}"
+                                onclick="return confirm('Remove this faculty member?')">
+                                <button class="btn-del">Remove</button>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                <!-- Inline edit row -->
+                <tr class="edit-row" id="edit-row-{{ f.faculty_id }}">
+                    <td colspan="6">
+                        <div class="edit-inner">
+                            <form onsubmit="submitEdit(event, {{ f.faculty_id }})">
+                                <div class="edit-field">
+                                    <span class="edit-field-label">Full Name</span>
+                                    <input class="edit-input" type="text" id="edit-name-{{ f.faculty_id }}"
+                                        placeholder="Enter faculty name" required minlength="2">
+                                </div>
+                                <div class="edit-field">
+                                    <span class="edit-field-label">Email Address</span>
+                                    <input class="edit-input" type="email" id="edit-email-{{ f.faculty_id }}"
+                                        placeholder="Enter email address (optional)">
+                                </div>
+                                <div class="edit-actions">
+                                    <button type="submit" class="btn-save">Save Changes</button>
+                                    <button type="button" class="btn-cancel-edit"
+                                        onclick="toggleEdit({{ f.faculty_id }}, '', '')">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-data">No faculty members added yet.</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="toast" id="toast">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span id="toast-msg">Done!</span>
+</div>
+
+<script>
+    const radios = document.querySelectorAll('input[name="faculty_type"]');
+    const visitingRow = document.getElementById('visitingDaysRow');
+
+    function updateVisibility() {
+        const isVisiting = document.getElementById('type_visiting').checked;
+        visitingRow.classList.toggle('visible', isVisiting);
+        if (!isVisiting) visitingRow.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    }
+    radios.forEach(r => r.addEventListener('change', updateVisibility));
+    updateVisibility();
+
+    document.getElementById('addFacultyForm').addEventListener('submit', function (e) {
+        const isVisiting = document.getElementById('type_visiting').checked;
+        if (isVisiting) {
+            const checked = visitingRow.querySelectorAll('input[type="checkbox"]:checked');
+            if (checked.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one visiting day for a Visiting faculty member.');
+            }
+        }
+    });
+
+    let currentlyOpen = null;
+
+    function toggleEdit(facultyId, currentName, currentEmail) {
+        const editRow = document.getElementById('edit-row-' + facultyId);
+        const nameInput = document.getElementById('edit-name-' + facultyId);
+        const emailInput = document.getElementById('edit-email-' + facultyId);
+        const editBtn = document.getElementById('edit-btn-' + facultyId);
+
+        // Close any other open edit rows
+        if (currentlyOpen && currentlyOpen !== facultyId) {
+            document.getElementById('edit-row-' + currentlyOpen).classList.remove('open');
+            document.getElementById('edit-btn-' + currentlyOpen).textContent = '✏️ Edit';
+        }
+
+        const isOpen = editRow.classList.contains('open');
+        if (isOpen) {
+            editRow.classList.remove('open');
+            editBtn.textContent = '✏️ Edit';
+            currentlyOpen = null;
+        } else {
+            editRow.classList.add('open');
+            editBtn.textContent = '✖ Cancel';
+            nameInput.value = currentName;
+            emailInput.value = currentEmail;
+            nameInput.focus();
+            currentlyOpen = facultyId;
+        }
+    }
+
+    function submitEdit(event, facultyId) {
+        event.preventDefault();
+        const nameInput = document.getElementById('edit-name-' + facultyId);
+        const emailInput = document.getElementById('edit-email-' + facultyId);
+        const newName = nameInput.value.trim();
+        const newEmail = emailInput.value.trim();
+
+        if (!newName) return;
+
+        fetch('/faculty/update/' + facultyId, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ new_name: newName, new_email: newEmail })
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    // Update name display
+                    document.getElementById('name-' + facultyId).textContent = newName;
+                    document.getElementById('avatar-' + facultyId).textContent = newName[0].toUpperCase();
+
+                    // Update email display
+                    const emailCell = document.getElementById('email-cell-' + facultyId);
+                    if (newEmail) {
+                        emailCell.innerHTML = `
+                        <span class="email-chip">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                            ${newEmail}
+                        </span>`;
+                    } else {
+                        emailCell.innerHTML = '<span class="no-email">Not set</span>';
+                    }
+
+                    // Update the Edit button's onclick with fresh values
+                    document.getElementById('edit-btn-' + facultyId)
+                        .setAttribute('onclick',
+                            `toggleEdit(${facultyId}, '${newName.replace(/'/g, "\\'")}', '${newEmail.replace(/'/g, "\\'")}')`
+                        );
+
+                    // Close the edit row
+                    document.getElementById('edit-row-' + facultyId).classList.remove('open');
+                    document.getElementById('edit-btn-' + facultyId).textContent = '✏️ Edit';
+                    currentlyOpen = null;
+
+                    showToast('Faculty updated successfully');
+                } else {
+                    alert(data.error || 'Failed to update faculty.');
+                }
+            })
+            .catch(() => alert('Network error. Please try again.'));
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-msg').textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+</script>
+
+{% endblock %}

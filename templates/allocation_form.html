@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Course Preference Form — {{ faculty_name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --ink: #1a1a2e;
+            --accent: #c84b31;
+            --accent2: #ecb365;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #0d0f20 0%, #141728 60%, #1a1830 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 40px 16px 60px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(200, 75, 49, 0.08) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 80%, rgba(236, 179, 101, 0.06) 0%, transparent 55%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .page-wrap {
+            max-width: 780px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass {
+            background: rgba(15, 18, 40, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* Header */
+        .header-card {
+            padding: 28px 30px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 55%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(236, 179, 101, 0.5), transparent);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .header-top h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px;
+            color: white;
+            font-weight: 400;
+            margin-bottom: 3px;
+        }
+
+        .header-top p {
+            font-size: 12.5px;
+            color: rgba(255, 255, 255, 0.45);
+            margin: 0;
+        }
+
+        .sem-type-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 11.5px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .stt-odd {
+            background: rgba(99, 179, 237, 0.12);
+            color: #7dd3fc;
+            border: 1px solid rgba(99, 179, 237, 0.25);
+        }
+
+        .stt-even {
+            background: rgba(236, 179, 101, 0.12);
+            color: #ecb365;
+            border: 1px solid rgba(236, 179, 101, 0.25);
+        }
+
+        .header-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.07);
+            margin-bottom: 14px;
+        }
+
+        .header-note {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.50);
+            line-height: 1.65;
+        }
+
+        .header-note strong {
+            color: rgba(255, 255, 255, 0.80);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 11px 16px;
+            border-radius: 9px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #fecaca;
+        }
+
+        .alert-warning {
+            background: rgba(251, 191, 36, 0.10);
+            border: 1px solid rgba(251, 191, 36, 0.22);
+            color: #fde68a;
+        }
+
+        /* Progress */
+        .progress-card {
+            padding: 18px 22px;
+            margin-bottom: 20px;
+        }
+
+        .progress-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .prog-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 7px;
+        }
+
+        .prog-label-row span:first-child {
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        .prog-count {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .prog-max {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .theory-label {
+            color: #7dd3fc;
+        }
+
+        .lab-label {
+            color: #fbbf24;
+        }
+
+        .prog-track {
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }
+
+        .prog-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.35s ease;
+        }
+
+        .prog-fill.theory {
+            background: linear-gradient(90deg, #3b82f6, #7dd3fc);
+        }
+
+        .prog-fill.lab {
+            background: linear-gradient(90deg, #d97706, #fbbf24);
+        }
+
+        /* Section cards */
+        .section-card {
+            padding: 26px 28px;
+            margin-bottom: 20px;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            flex-shrink: 0;
+        }
+
+        .sb-theory {
+            background: rgba(59, 130, 246, 0.15);
+            color: #7dd3fc;
+            border: 1px solid rgba(59, 130, 246, 0.25);
+        }
+
+        .sb-lab {
+            background: rgba(217, 119, 6, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(217, 119, 6, 0.25);
+        }
+
+        .section-head h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
+
+        .section-sub {
+            font-size: 12.5px;
+            color: rgba(255, 255, 255, 0.40);
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .section-sub strong {
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        /* Semester group label */
+        .sem-group-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.30);
+            margin: 18px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sem-group-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        /* Course grid */
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 10px;
+        }
+
+        .course-card {
+            border: 1.5px solid rgba(255, 255, 255, 0.09);
+            border-radius: 11px;
+            padding: 14px 16px;
+            cursor: pointer;
+            position: relative;
+            transition: border-color 0.2s, background 0.2s, transform 0.15s;
+            display: block;
+        }
+
+        .course-card:hover {
+            border-color: rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-1px);
+        }
+
+        .course-card.selected-theory {
+            border-color: rgba(59, 130, 246, 0.55);
+            background: rgba(59, 130, 246, 0.09);
+        }
+
+        .course-card.selected-lab {
+            border-color: rgba(217, 119, 6, 0.55);
+            background: rgba(217, 119, 6, 0.09);
+        }
+
+        .course-card.disabled-card {
+            opacity: 0.38;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        input[type=checkbox] {
+            display: none;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .card-name {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: white;
+            line-height: 1.3;
+        }
+
+        .card-code {
+            font-size: 11.5px;
+            color: rgba(255, 255, 255, 0.42);
+            margin-top: 3px;
+        }
+
+        .card-sem {
+            font-size: 10.5px;
+            color: rgba(255, 255, 255, 0.28);
+            margin-top: 2px;
+        }
+
+        .card-badges {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+
+        .credit-badge {
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.07);
+            color: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            white-space: nowrap;
+        }
+
+        .co-badge {
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 10.5px;
+            font-weight: 700;
+            background: rgba(156, 163, 175, 0.10);
+            color: #9ca3af;
+            border: 1px solid rgba(156, 163, 175, 0.18);
+            white-space: nowrap;
+        }
+
+        .already-badge {
+            margin-top: 8px;
+            padding: 3px 9px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(34, 197, 94, 0.12);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.22);
+            display: inline-block;
+        }
+
+        /* Checkmark indicator */
+        .course-card.selected-theory::after,
+        .course-card.selected-lab::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .course-card.selected-theory::after {
+            background-color: rgba(59, 130, 246, 0.8);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+        }
+
+        .course-card.selected-lab::after {
+            background-color: rgba(217, 119, 6, 0.8);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 36px 16px;
+            color: rgba(255, 255, 255, 0.28);
+            font-size: 13.5px;
+        }
+
+        .empty-state svg {
+            opacity: 0.2;
+            display: block;
+            margin: 0 auto 12px;
+        }
+
+        /* Submit */
+        .submit-wrap {
+            padding: 24px 28px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #c84b31, #e06040);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            box-shadow: 0 4px 20px rgba(200, 75, 49, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(200, 75, 49, 0.55);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .submit-hint {
+            text-align: center;
+            font-size: 12.5px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 10px;
+        }
+
+        .submit-hint.ready {
+            color: #4ade80;
+        }
+
+        /* Elective group sub-label */
+        .elec-group-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0 10px;
+        }
+
+        .elec-group-divider-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            padding: 3px 12px;
+            border-radius: 100px;
+            background: rgba(168, 85, 247, 0.12);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            white-space: nowrap;
+        }
+
+        .elec-group-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(168, 85, 247, 0.15);
+        }
+
+        .elec-course-card {
+            border-color: rgba(168, 85, 247, 0.18) !important;
+        }
+
+        .elec-course-card:hover {
+            border-color: rgba(168, 85, 247, 0.40) !important;
+            background: rgba(168, 85, 247, 0.05) !important;
+        }
+
+        .elec-course-card.selected-theory {
+            border-color: rgba(59, 130, 246, 0.55) !important;
+            background: rgba(59, 130, 246, 0.09) !important;
+        }
+
+        .card-group-tag {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            background: rgba(168, 85, 247, 0.10);
+            color: #c084fc;
+            border: 1px solid rgba(168, 85, 247, 0.18);
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        .regular-theory-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 10px;
+        }
+
+        .regular-theory-divider-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .regular-theory-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.07);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-wrap">
+
+        <!-- Header -->
+        <div class="glass header-card">
+            <div class="header-top">
+                <div class="avatar">{{ faculty_name[0]|upper }}</div>
+                <div>
+                    <h2>{{ faculty_name }}</h2>
+                    <p>Course Preference Form</p>
+                    <span class="sem-type-tag {{ 'stt-odd' if semester_type == 'odd' else 'stt-even' }}">
+                        {{ 'Odd Semesters — 1, 3, 5, 7' if semester_type == 'odd' else 'Even Semesters — 2, 4, 6, 8' }}
+                    </span>
+                </div>
+            </div>
+            <div class="header-divider"></div>
+            <p class="header-note">
+                Select exactly <strong>{{ theory_quota }} theory course(s)</strong> and
+                <strong>{{ lab_quota }} lab course(s)</strong> from across all
+                {{ 'odd' if semester_type == 'odd' else 'even' }} semesters below.
+                Labs marked "co-teacher" already have a primary teacher.
+            </p>
+        </div>
+
+        <!-- Alerts -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}
+        <div class="alert alert-{{ 'error' if cat=='error' else 'warning' }}">{{ msg }}</div>
+        {% endfor %}
+        {% endwith %}
+
+        <form method="POST" id="prefForm">
+
+            <!-- Progress -->
+            <div class="glass progress-card">
+                <div class="progress-row">
+                    <div>
+                        <div class="prog-label-row">
+                            <span class="theory-label">Theory Selected</span>
+                            <span><span class="prog-count theory-label" id="theory-count">0</span><span
+                                    class="prog-max"> / {{ theory_quota }}</span></span>
+                        </div>
+                        <div class="prog-track">
+                            <div class="prog-fill theory" id="theory-bar" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="prog-label-row">
+                            <span class="lab-label">Lab Selected</span>
+                            <span><span class="prog-count lab-label" id="lab-count">0</span><span class="prog-max"> / {{
+                                    lab_quota }}</span></span>
+                        </div>
+                        <div class="prog-track">
+                            <div class="prog-fill lab" id="lab-bar" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theory courses -->
+            <div class="glass section-card">
+                <div class="section-head">
+                    <span class="section-badge sb-theory">Theory</span>
+                    <h3>Available Theory Courses</h3>
+                </div>
+                <p class="section-sub">
+                    Select <strong>{{ theory_quota }}</strong> course(s) from any semester.
+                    Courses already taken by senior faculty are not shown.
+                    <strong style="color:#c084fc;">⚡ Elective</strong> courses are grouped by their elective group.
+                </p>
+
+                {% if all_theory %}
+                {# Separate regular and elective theory courses #}
+                {% set regular_theory = [] %}
+                {% set elec_groups = {} %}
+                {% for c in all_theory %}
+                {% if c.elective_group_id %}
+                {# group by group_name — use a list-based approach #}
+                {% if c.group_name not in elec_groups %}
+                {% set _ = elec_groups.update({c.group_name: []}) %}
+                {% endif %}
+                {% set _ = elec_groups[c.group_name].append(c) %}
+                {% else %}
+                {% set _ = regular_theory.append(c) %}
+                {% endif %}
+                {% endfor %}
+
+                {# Regular theory courses, grouped by semester #}
+                {% if regular_theory %}
+                <div class="regular-theory-divider"><span class="regular-theory-divider-label">Regular Courses</span>
+                </div>
+                {% set current_sem = namespace(val=0) %}
+                {% for c in regular_theory %}
+                {% if c.semester != current_sem.val %}
+                {% set current_sem.val = c.semester %}
+                {% if not loop.first %}
+            </div>{% endif %}
+            <div class="sem-group-label">Semester {{ c.semester }}</div>
+            <div class="course-grid" style="margin-bottom:4px">
+                {% endif %}
+
+                <label class="course-card" id="tc-{{ c.course_id }}" data-type="theory">
+                    <input type="checkbox" name="theory_courses" value="{{ c.course_id }}"
+                        onchange="handleSelect(this,'theory')">
+                    <div class="card-top">
+                        <div>
+                            <div class="card-name">{{ c.course_name }}</div>
+                            <div class="card-code">{{ c.course_code }}</div>
+                            <div class="card-sem">Semester {{ c.semester }}</div>
+                        </div>
+                        <div class="card-badges">
+                            <span class="credit-badge">{{ c.credits }} cr</span>
+                        </div>
+                    </div>
+                </label>
+
+                {% if loop.last %}
+            </div>
+            {% elif regular_theory[loop.index].semester != c.semester %}
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    {# Elective group courses #}
+    {% for group_name, group_courses in elec_groups.items() %}
+    <div class="elec-group-divider">
+        <span class="elec-group-divider-label">⚡ Elective Group: {{ group_name }}</span>
+    </div>
+    <div class="course-grid" style="margin-bottom:14px">
+        {% for c in group_courses %}
+        <label class="course-card elec-course-card" id="tc-{{ c.course_id }}" data-type="theory">
+            <input type="checkbox" name="theory_courses" value="{{ c.course_id }}"
+                onchange="handleSelect(this,'theory')">
+            <div class="card-top">
+                <div>
+                    <div class="card-name">{{ c.course_name }}</div>
+                    <div class="card-code">{{ c.course_code }}</div>
+                    <div class="card-sem">Semester {{ c.semester }}</div>
+                    <span class="card-group-tag">{{ group_name }}</span>
+                </div>
+                <div class="card-badges">
+                    <span class="credit-badge">{{ c.credits }} cr</span>
+                </div>
+            </div>
+        </label>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="17" x2="12" y2="21" />
+        </svg>
+        No theory courses available — all taken by senior faculty.
+    </div>
+    {% endif %}
+    </div>
+
+    <!-- Lab courses -->
+    <div class="glass section-card">
+        <div class="section-head">
+            <span class="section-badge sb-lab">Lab</span>
+            <h3>Available Lab Courses</h3>
+        </div>
+        <p class="section-sub">
+            Select <strong>{{ lab_quota }}</strong> lab(s) from any semester.
+            You may be assigned as primary or co-teacher depending on availability.
+        </p>
+
+        {% if all_labs %}
+        {% set current_sem = namespace(val=0) %}
+        {% for c in all_labs %}
+        {% set already = c.course_id in already_picked %}
+        {% if c.semester != current_sem.val %}
+        {% set current_sem.val = c.semester %}
+        <div class="sem-group-label">Semester {{ c.semester }}</div>
+        <div class="course-grid" style="margin-bottom:4px">
+            {% endif %}
+
+            <label class="course-card {{ 'disabled-card' if already }}" id="lc-{{ c.course_id }}" data-type="lab">
+                <input type="checkbox" name="lab_courses" value="{{ c.course_id }}" {{ 'disabled' if already }}
+                    onchange="handleSelect(this,'lab')">
+                <div class="card-top">
+                    <div>
+                        <div class="card-name">{{ c.course_name }}</div>
+                        <div class="card-code">{{ c.course_code }}</div>
+                    </div>
+                    <div class="card-badges">
+                        <span class="credit-badge">{{ c.credits }} cr</span>
+                        {% if c.assigned_count > 0 %}
+                        <span class="co-badge">{{ c.assigned_count }}/3 teachers</span>
+                        {% endif %}
+                        {% if c.assigned_count >= 3 %}
+                        <span class="co-badge"
+                            style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.25);">Full</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if already %}
+                <div><span class="already-badge">Already selected by you</span></div>
+                {% endif %}
+            </label>
+
+            {% if loop.last %}
+        </div>
+        {% elif all_labs[loop.index].semester != c.semester %}
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% else %}
+    <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 20h20M7 20V10M12 20V4M17 20v-7" />
+        </svg>
+        No lab courses available.
+    </div>
+    {% endif %}
+    </div>
+
+    <!-- Submit -->
+    <div class="glass submit-wrap">
+        <button type="submit" class="btn-submit" id="submitBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+            Finish &amp; Submit
+        </button>
+        <p class="submit-hint ready" id="submitHint">
+            You can submit at any time with your current selections.
+        </p>
+    </div>
+
+    </form>
+    </div>
+
+    <script>
+        const THEORY_Q = {{ theory_quota }};
+        const LAB_Q = {{ lab_quota }};
+        let theoryCount = 0, labCount = 0;
+
+        function handleSelect(cb, type) {
+            const card = cb.closest('.course-card');
+            const isChecked = cb.checked;
+
+            if (type === 'theory') {
+                // Allow up to THEORY_Q selections max
+                if (isChecked && theoryCount >= THEORY_Q) { cb.checked = false; return; }
+                theoryCount += isChecked ? 1 : -1;
+                card.classList.toggle('selected-theory', isChecked);
+            } else {
+                // Allow up to LAB_Q selections max
+                if (isChecked && labCount >= LAB_Q) { cb.checked = false; return; }
+                labCount += isChecked ? 1 : -1;
+                card.classList.toggle('selected-lab', isChecked);
+            }
+
+            // Update progress bars
+            document.getElementById('theory-count').textContent = theoryCount;
+            document.getElementById('lab-count').textContent = labCount;
+            const tBar = document.getElementById('theory-bar');
+            const lBar = document.getElementById('lab-bar');
+            if (tBar) tBar.style.width = (THEORY_Q > 0 ? theoryCount / THEORY_Q * 100 : 0) + '%';
+            if (lBar) lBar.style.width = (LAB_Q > 0 ? labCount / LAB_Q * 100 : 0) + '%';
+
+            // Hint text — informational only, button always enabled
+            const hint = document.getElementById('submitHint');
+            const parts = [];
+            if (theoryCount > 0) parts.push(theoryCount + ' theory');
+            if (labCount > 0) parts.push(labCount + ' lab');
+            hint.textContent = parts.length
+                ? 'Selected: ' + parts.join(', ') + ' course(s). Submit whenever ready.'
+                : 'You can submit with no selections, or pick your courses above.';
+            hint.className = 'submit-hint ready';
+        }
+    </script>
+</body>
+
+</html>

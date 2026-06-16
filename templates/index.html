@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="hero"
+style="background: url('{{ url_for('static', filename='images/bg.jpg') }}') no-repeat center center/cover;">
+
+    <div class="overlay">
+        <h1>Time Table Generation</h1>
+        <p>Automatic Scheduling Made Easy</p>
+
+        <a href="{{ url_for('departments') }}">
+            <button>Generate Now</button>
+        </a>
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+html, body { overflow-y: auto !important; }
+
+.wrap { width: 88%; max-width: 960px; margin: 44px auto 80px; }
+
+.page-header {
+    margin-bottom: 32px;
+    animation: fadeUp 0.5s ease both;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 34px;
+    color: white;
+    font-weight: 400;
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+}
+
+.page-header p { color: rgba(255,255,255,0.55); font-size: 14.5px; }
+
+/* FLASH */
+.flash { border-radius: 8px; padding: 12px 18px; margin-bottom: 20px; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 10px; animation: fadeUp 0.4s ease both; }
+.flash-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+.flash-error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.flash svg { flex-shrink: 0; }
+
+/* ADD FORM */
+.add-card {
+    background: rgba(255,255,255,0.96);
+    border-radius: 14px;
+    padding: 28px 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+    animation: fadeUp 0.5s 0.1s ease both;
+}
+
+.add-card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    color: #1a1a2e;
+    font-weight: 400;
+    margin-bottom: 18px;
+}
+
+.form-row { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.form-row input {
+    padding: 10px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    flex: 1; min-width: 150px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    color: #1a1a2e;
+}
+
+.form-row input:focus {
+    outline: none;
+    border-color: #2d3561;
+    box-shadow: 0 0 0 3px rgba(45,53,97,0.1);
+}
+
+.add-btn {
+    background: #1a1a2e;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    white-space: nowrap;
+}
+
+.add-btn:hover { background: #2d3561; transform: translateY(-1px); }
+
+/* TABLE CARD */
+.table-card {
+    background: rgba(255,255,255,0.96);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    animation: fadeUp 0.5s 0.2s ease both;
+}
+
+.table-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #f0f1f5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.table-header span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.count-badge {
+    background: #f3f4f8;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px;
+}
+
+table { width: 100%; border-collapse: collapse; }
+
+thead th {
+    background: #1a1a2e;
+    color: rgba(255,255,255,0.75);
+    padding: 12px 20px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+tbody tr {
+    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.15s;
+}
+
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f9faff; }
+
+tbody td {
+    padding: 14px 20px;
+    font-size: 14px;
+    color: #374151;
+    vertical-align: middle;
+}
+
+.dept-id { font-weight: 700; color: #1a1a2e; font-size: 13px; }
+.dept-name { font-weight: 500; }
+
+.actions { display: flex; gap: 8px; }
+
+.btn-nav, .btn-del {
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.2s, transform 0.15s;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 5px;
+}
+
+.btn-nav:hover, .btn-del:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.btn-courses  { background: #eff6ff; color: #1d4ed8; }
+.btn-faculties { background: #f0fdf4; color: #166534; }
+.btn-del      { background: #fef2f2; color: #dc2626; }
+
+.no-data {
+    text-align: center;
+    padding: 50px 24px;
+    color: #9ca3af;
+    font-size: 15px;
+}
+</style>
+
+<div class="wrap">
+    <div class="page-header">
+        <h1>Departments</h1>
+        <p>Manage academic departments and navigate to their faculties and courses</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+            {% if category == 'success' %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            {% else %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            {% endif %}
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endwith %}
+
+    <div class="add-card">
+        <h3>Add New Department</h3>
+        <form method="POST">
+            <div class="form-row">
+                <input type="number" name="dept_id" placeholder="Department ID" required>
+                <input type="text" name="dept_name" placeholder="Department Name" required>
+                <button class="add-btn" type="submit">Add Department</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-card">
+        <div class="table-header">
+            <span>All Departments</span>
+            <span class="count-badge">{{ departments | length }} total</span>
+        </div>
+
+        {% if departments %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Department Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dept in departments %}
+                <tr>
+                    <td><span class="dept-id">#{{ dept.dept_id }}</span></td>
+                    <td><span class="dept-name">{{ dept.dept_name }}</span></td>
+                    <td>
+                        <div class="actions">
+                            <a href="{{ url_for('courses', dept_id=dept.dept_id) }}" class="btn-nav btn-courses">Courses</a>
+                            <a href="{{ url_for('faculties', dept_id=dept.dept_id) }}" class="btn-nav btn-faculties">Faculties</a>
+                            <a href="{{ url_for('delete_department', dept_id=dept.dept_id) }}"
+                               onclick="return confirm('Delete department and all related data?')">
+                                <button class="btn-del">Delete</button>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-data">No departments added yet. Add one above to get started.</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
